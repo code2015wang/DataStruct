@@ -1621,3 +1621,96 @@ public class Solution {
 /*有点判断链表是否存在环的感觉，当链表到头，即为null时，回到另一个链表，继续追*/
 ```
 
+# 2017-4-25
+
+## 两数之和
+
+> 给定一个排序的整数数组，找出这样的数，他们的和等于一个特定的目标数字。函数应该返回两个数的索引，这两个数相加等于目标数字，其中index1必须小于index2.
+
+代码如下：
+
+```java
+/*题目提示是排序数组，可以考虑二分查找*/
+public class Solution {
+    public int[] twoSum(int[] numbers, int target) {
+       int start = 0, end = numbers.length - 1;
+        while(start < end){
+            if(numbers[start] + numbers[end] == target) break;
+            if(numbers[start] + numbers[end] < target) start++;
+            else end--;
+        }
+        return new int[]{start + 1, end + 1};
+    }
+}
+```
+
+还有一个方法是使用数据结构hashmap
+
+代码如下：
+
+```java
+import java.util.HashMap;
+public class Solution {
+    public int[] twoSum(int[] numbers, int target) {
+ 
+        int[] result=new int[2];//存储结果
+        HashMap<Integer,Integer> map=new HashMap();
+        //遍历初始化hashmap,
+        for(int j=0;j<numbers.length;j++){
+            map.put(numbers[j],j);
+        }
+        //同时寻找结果
+        for(int i=0;i<numbers.length;i++){
+            int sencond=target-numbers[i];
+            if(map.get(sencond)!=null){
+                result[0]=i+1;
+                result[1]=(int)map.get(sencond)+1;
+                break;
+            }
+        }
+        return result;
+    }
+}
+```
+
+## Excel表格列标题
+
+> 给定一个整数，返回相对应的列标题。例如：
+>
+> ```
+>  1 -> A
+>     2 -> B
+>     3 -> C
+>     ...
+>     26 -> Z
+>     27 -> AA
+>     28 -> AB 
+> ```
+
+我们分析列标题与整数之间对应关系如下：
+
+```
+A   1     AA    26+ 1     BA  2×26+ 1     ...     ZA  26×26+ 1     AAA  1×26²+1×26+ 1
+B   2     AB    26+ 2     BB  2×26+ 2     ...     ZB  26×26+ 2     AAB  1×26²+1×26+ 2
+.   .     ..    .....     ..  .......     ...     ..  ........     ...  .............   
+.   .     ..    .....     ..  .......     ...     ..  ........     ...  .............
+.   .     ..    .....     ..  .......     ...     ..  ........     ...  .............
+Z  26     AZ    26+26     BZ  2×26+26     ...     ZZ  26×26+26     AAZ  1×26²+1×26+26
+```
+
+代码如下：
+
+```java
+public class Solution {
+    public String convertToTitle(int n) {
+       StringBuilder result=new StringBuilder();
+       while(n>0){
+           n--;//注意这个先减一
+           result.insert(0,(char)('A'+n%26));//注意这个(char)('A'+n%26)
+           n=n/26;
+       }
+       return result.toString();
+    }
+}
+```
+
