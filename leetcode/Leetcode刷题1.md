@@ -1714,3 +1714,382 @@ public class Solution {
 }
 ```
 
+# 2017-4-26
+
+## 多数元素
+
+> 给定大小为n的数组，找到多数元素。多数元素是出现超过[n/2]次的元素。我们简爱设该元素部位空，并且多数元素始终存在数组中。
+
+> 该题目存在多种解法，如排序、hashmap、选举、位运算等方法。
+>
+> 1. 排序：对数组进行排序，因为元素存在，所以排序后的数组，在[n/2]位置一定维多数元素。
+> 2. hashmap：对数组遍历，判断hashmap是否在,若存在计数加一，否则计数为1,放入hashmap中。
+> 3. 选举算法
+> 4. 位运算
+
+代码如下:
+
+```java
+// Sorting
+public int majorityElement1(int[] nums) {
+    Arrays.sort(nums);
+    return nums[nums.length/2];
+}
+
+// Hashtable 
+public int majorityElement2(int[] nums) {
+    Map<Integer, Integer> myMap = new HashMap<Integer, Integer>();
+    //Hashtable<Integer, Integer> myMap = new Hashtable<Integer, Integer>();
+    int ret=0;
+    for (int num: nums) {
+        if (!myMap.containsKey(num))
+            myMap.put(num, 1);
+        else
+            myMap.put(num, myMap.get(num)+1);
+        if (myMap.get(num)>nums.length/2) {
+            ret = num;
+            break;
+        }
+    }
+    return ret;
+}
+
+// Moore voting algorithm
+public int majorityElement3(int[] nums) {
+    int count=0, ret = 0;
+    for (int num: nums) {
+        if (count==0)
+            ret = num;
+        if (num!=ret)
+            count--;
+        else
+            count++;
+    }
+    return ret;
+}
+
+// Bit manipulation 
+public int majorityElement(int[] nums) {
+    int[] bit = new int[32];
+    for (int num: nums)
+        for (int i=0; i<32; i++) 
+            if ((num>>(31-i) & 1) == 1)
+                bit[i]++;
+    int ret=0;
+    for (int i=0; i<32; i++) {
+        bit[i]=bit[i]>nums.length/2?1:0;
+        ret += bit[i]*(1<<(31-i));
+    }
+    return ret;
+}
+```
+
+## excel 表格数字
+
+> 和excel表格标题类似，要求给出一个字符串然后转换成整数。注意上题中，字符串和整数到对应关系。
+
+代码如下：
+
+```java
+public class Solution {
+    public int titleToNumber(String s) {
+        int len=s.length();
+        double result=0.0;
+        for(int i=0;i<len;i++){
+            char c=s.charAt(i);
+            result=result+(c-'A'+1)*Math.pow(26,len-1-i);
+        }
+        return (int)result;
+    }
+}
+```
+
+## 阶乘中零的个数
+
+> 给定整数n，返回n！中尾随零的个数。注意：解决方案，应该是对数时间复杂度的。
+
+> 我们做如下分析：10是2和5的成绩，在n！中，我们需要知道多少个2和5,零的数量等于2和5的个数的最小值。由于从1到n，2的倍数总超过5的倍数，所以零的数量一般等于5的个数,即看n里面有躲闪个5呗。
+
+代码如下：
+
+```java
+public class Solution {
+    public int trailingZeroes(int n) {
+        return n == 0 ? 0 : n / 5 + trailingZeroes(n / 5);//注意这里前面还有n/5,然后才递归
+    }
+}
+```
+
+## 反转数组
+
+> 将n个元素的数组向右先转k步。例如，在n=7和k=3的情况下，数组[1,2,3,4,5,6,7],旋转为[5,6,7,1,2,3,4]
+
+> 我们这里把问题分为三步来做：
+>
+> 1.反转整个数组[0,len-1],
+>
+> 2 .反转数组[0,k-1],
+>
+> 3.反转数组[k,len-1]
+>
+> 由于数组不存在，resercve函数，因此需要自己实现反准过程。
+
+代码如下：
+
+```java
+public class Solution {
+    public void rotate(int[] nums, int k) {
+        
+     k %= nums.length;
+    reverse(nums, 0, nums.length - 1);
+    reverse(nums, 0, k - 1);
+    reverse(nums, k, nums.length - 1);
+}
+
+public void reverse(int[] nums, int start, int end) {
+    while (start < end) {
+        int temp = nums[start];
+        nums[start] = nums[end];
+        nums[end] = temp;
+        start++;
+        end--;
+    }
+}//注意这里实现的反转过程。
+}
+```
+
+## 反转32无符号的二进制数
+
+> 给定一个32位的整数，转换为32的二进制，把二进制反转，输出对应的整数。
+
+> 十进制转换为二进制，根据不同的开发语言其zhu按换方式有多种，在java中如果把一个十进制转换为一个二进制的话，非常简单使用Integer.toBinaryString(int)即可。但如果转换的不是十进制而是带小数的十进制数，那么没娜么容易了，需要把十进制和小数部分分开。
+>
+> java提供的位运算符由：左移（<<）、右移(>>)、无符号右移(>>>)、位与(&)、位或(|)、位非(～)、位异或(^),除了位非（～）是一元操作符外，其他都是二元操作符。其次，位操作只能用于整型数据，对float和double类型进行位操作会被编译器报错。位操作符优先级比较第，因此要尽量使用括号保证正确运算顺序，否则会得到莫名其妙的结果。
+>
+> ### 常用位操作小技巧
+>
+> 下面对位操作的一些常见应用做个总结，有判断奇偶、交换两数、变换符号及求绝对值。这些小技巧应用易记，应当熟练掌握。
+>
+> 1. 判断奇偶。
+>
+> 只要根据最末位是0还是1来决定，为0就是偶数，为1就是奇数。因此可以用if((a&1)==0)代替if(a%2==0)来判断a是否为偶数。
+>
+> ```
+> for(int i=0;i<100;i++){
+>   if((a&1)==0){//偶数
+>     System.out.println(i);
+>   }
+> }
+> ```
+>
+> 2. 交换两数
+>
+> ```
+> int c = 1, d = 2;
+> c ^= d;
+> d ^= c;
+> c ^= d;
+> System.out.println("c=" + c);
+> System.out.println("d=" + d);
+> ```
+>
+> 可以这样理解：
+> **第一步** a^=b 即a=(a^b)；
+> **第二步** b^=a 即b=b^(a^b)，由于^运算满足交换律，b^(a^b)=b^b^a。由于一个数和自己异或的结果为0并且任何数与0异或都会不变的，所以此时b被赋上了a的值；
+> **第三步** a^=b 就是a=a^b，由于前面二步可知a=(a^b)，b=a，所以a=a^b即a=(a^b)^a。故a会被赋上b的值；
+>
+> 3. 变换符号
+>
+> ```
+> int a = -15, b = 15;
+> System.out.println(~a + 1);
+> System.out.println(~b + 1);
+> ```
+>
+> 变换符号自需取反加1即可。
+>
+> 4. 取绝对值
+>
+> 因此先移位来取符号位，int i = a >> 31;要注意如果a为正数，i等于0，为负数，i等于-1。然后对i进行判断——如果i等于0，直接返回。否之，返回~a+1。完整代码如下：
+>
+> ```
+> int i = a >> 31;
+> System.out.println(i == 0 ? a : (~a + 1));
+> ```
+>
+> 现在再分析下。对于任何数，与0异或都会保持不变，与-1即0xFFFFFFFF异或就相当于取反。因此，a与i异或后再减i（因为i为0或-1，所以减i即是要么加0要么加1）也可以得到绝对值。所以可以对上面代码优化下：
+>
+> ```
+> int j = a >> 31;
+> System.out.println((a ^ j) - j);
+> ```
+>
+> ### 位操作技巧
+>
+> ```
+> // 1. 获得int型最大值
+> System.out.println((1 << 31) - 1);// 2147483647， 由于优先级关系，括号不可省略
+> System.out.println(~(1 << 31));// 2147483647
+>
+> // 2. 获得int型最小值
+> System.out.println(1 << 31);
+> System.out.println(1 << -1);
+>
+> // 3. 获得long类型的最大值
+> System.out.println(((long)1 << 127) - 1);
+>
+> // 4. 乘以2运算
+> System.out.println(10<<1);
+>
+> // 5. 除以2运算(负奇数的运算不可用)
+> System.out.println(10>>1);
+>
+> // 6. 乘以2的m次方
+> System.out.println(10<<2);
+>
+> // 7. 除以2的m次方
+> System.out.println(16>>2);
+>
+> // 8. 判断一个数的奇偶性
+> System.out.println((10 & 1) == 1);
+> System.out.println((9 & 1) == 1);
+>
+> // 9. 不用临时变量交换两个数（面试常考）
+> a ^= b;
+> b ^= a;
+> a ^= b;
+>
+> // 10. 取绝对值（某些机器上，效率比n>0 ? n:-n 高）
+> int n = -1;
+> System.out.println((n ^ (n >> 31)) - (n >> 31));
+> /* n>>31 取得n的符号，若n为正数，n>>31等于0，若n为负数，n>>31等于-1
+> 若n为正数 n^0-0数不变，若n为负数n^-1 需要计算n和-1的补码，异或后再取补码，
+> 结果n变号并且绝对值减1，再减去-1就是绝对值 */
+>
+> // 11. 取两个数的最大值（某些机器上，效率比a>b ? a:b高）
+> System.out.println(b&((a-b)>>31) | a&(~(a-b)>>31));
+>
+> // 12. 取两个数的最小值（某些机器上，效率比a>b ? b:a高）
+> System.out.println(a&((a-b)>>31) | b&(~(a-b)>>31));
+>
+> // 13. 判断符号是否相同(true 表示 x和y有相同的符号， false表示x，y有相反的符号。)
+> System.out.println((a ^ b) > 0);
+>
+> // 14. 计算2的n次方 n > 0
+> System.out.println(2<<(n-1));
+>
+> // 15. 判断一个数n是不是2的幂
+> System.out.println((n & (n - 1)) == 0);
+> /*如果是2的幂，n一定是100... n-1就是1111....
+> 所以做与运算结果为0*/
+>
+> // 16. 求两个整数的平均值
+> System.out.println((a+b) >> 1);
+>
+> // 17. 从低位到高位,取n的第m位
+> int m = 2;
+> System.out.println((n >> (m-1)) & 1);
+>
+> // 18. 从低位到高位.将n的第m位置为1
+> System.out.println(n | (1<<(m-1)));
+> /*将1左移m-1位找到第m位，得到000...1...000
+> n在和这个数做或运算*/
+>
+> // 19. 从低位到高位,将n的第m位置为0
+> System.out.println(n & ~(0<<(m-1)));
+> /* 将1左移m-1位找到第m位，取反后变成111...0...1111
+> n再和这个数做与运算*/
+> ```
+
+代码如下：
+
+```java
+public class Solution {
+    // you need treat n as an unsigned value
+  //这段代码更好理解
+    public int reverseBits(int n) {
+       StringBuffer sb = new StringBuffer();
+    	String s = Integer.toBinaryString(n);//把整型数转换成二进制
+    	for(int i = 0; i < 32-s.length(); i++)
+    		sb.append('0');
+    	s = sb.toString() + s;//填充为32位二进制
+        char[]  c = s.toCharArray();
+        int r = 0;
+        for(int i = 0; i < 32; i++){//注意这里没有反转字符串，因为从0开始处理就和反转之后从末
+          //尾处理效果一样
+        	if(c[i] == '1')
+        		r += (1 << i);//二进制转换为int（使用移位操作很简洁）
+        }
+        return r;
+    }
+}
+```
+
+## '1'位的个数
+
+> 编写一个使用无符号整数的函数，并返回它拥有的“1”位数（也称汉明权重）。例如，32位整数'11'的二进制表示为00000000000000000000000000001011，所以函数应该返回3。
+
+代码如下：
+
+```java
+public class Solution {
+    // you need to treat n as an unsigned value
+    public int hammingWeight(int n) {
+        String s=Integer.toBinaryString(n);
+        char[] c=s.toCharArray();
+        int result=0;
+        for(int i=0;i<s.length();i++)
+        if(c[i]=='1'){
+            result=result+1;
+        }
+        return result;
+    }
+}
+```
+
+一种更优雅的方法如下：
+
+```java
+public class Solution {
+    // you need to treat n as an unsigned value
+    public int hammingWeight(int n) {
+        int ones = 0;
+    	while(n!=0) {
+    		ones = ones + (n & 1);//n&1 获得n的二进制的末位
+    		n = n>>>1;//无符号右移，
+    	}
+    	return ones;
+    }
+}
+```
+
+## 强盗
+
+> 你是一个专业的强盗，计划在街上抢劫房子。每个房子都有一定数量的钱，唯一限制是阻止你抢劫每个房屋，相邻房屋有安全系统连接，如果来嗯个相邻房屋在同一天晚上被抢劫，他们会自动来拿希警察。给出一个代表每个房子的非负整数列表，确定你晚上可以抢劫的最大金额，而不用警报。
+
+这个题目，我们首先使用动态规划算法来求解这个问题，
+
+代码如下：
+
+```java
+public class Solution {
+    public int rob(int[] nums) {
+        int[][] dp = new int[nums.length + 1][2];
+    for (int i = 1; i <= nums.length; i++) {
+        dp[i][0] = Math.max(dp[i - 1][0], dp[i - 1][1]);
+        dp[i][1] = nums[i - 1] + dp[i - 1][0];
+    }
+    return Math.max(dp[nums.length][0], dp[nums.length][1]);
+
+    }
+}
+//dp[i][1] means we rob the current house and dp[i][0] means we don't,
+```
+
+​      动态规划是一种在数学、计算机科学和经济学中使用的，通常把原问题分解维相对简单的子问题的方式求解复杂问题的方法。dongtaiguihau常常适应于有重叠自问题和最优结构性质的问题。动态规划背后的基本思想非常简爱男单，大致上，若要解决一个给定的问题，我们需要解其不同部分(即子问题)，在合并子问题的接以得到原问题的解。
+
+​     通常许多子问题非产相似，为此动态规划法试图仅仅解决子问题一次，从而减少计算量。一旦某个给定子问题的解已经算出，则要将其记忆化存储，以便下次需要同一个子问题解时直接查表。这种做法在重复子问题的数目关于输入规模呈指数增长时特别有用。
+
+​       简言之，动态规划的思路是通过寻找字节够同时记录最优结构，从而将复杂的大问题转换维小问题的求解过程。解决动态规划类问题，分为两部：1.确定状态 2.根据状态转移方程确定该状态上可以执行的操作，然后是该状态和前一个状态或者前多个状态有什么关联，通常改装态下可执行的操作哦必定是关联我们之前的几个状态。
+
+​        关于题目：我们可以在通过一个数组来记录下来，我们在每个位置打劫，所能得到的钱，在求下一个状态的时候，遍历前面的与其相隔的所有状态，然后找到一个最大的，但是复杂度比较到达到了n2，空间复杂度为n，对于状态，我们需要记录的只有其前一个，还有与其相隔的所有状态的最大值，因此通过两个数字来表示即可。
