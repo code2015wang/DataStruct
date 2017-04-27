@@ -2093,3 +2093,212 @@ public class Solution {
 ​       简言之，动态规划的思路是通过寻找字节够同时记录最优结构，从而将复杂的大问题转换维小问题的求解过程。解决动态规划类问题，分为两部：1.确定状态 2.根据状态转移方程确定该状态上可以执行的操作，然后是该状态和前一个状态或者前多个状态有什么关联，通常改装态下可执行的操作哦必定是关联我们之前的几个状态。
 
 ​        关于题目：我们可以在通过一个数组来记录下来，我们在每个位置打劫，所能得到的钱，在求下一个状态的时候，遍历前面的与其相隔的所有状态，然后找到一个最大的，但是复杂度比较到达到了n2，空间复杂度为n，对于状态，我们需要记录的只有其前一个，还有与其相隔的所有状态的最大值，因此通过两个数字来表示即可。
+
+数组dp可以看作是存储上一个状态的结果。我们看:
+
+```
+dp[i][0]=Math.max(dp[i-1][0],dp[i-1][0]);//存储上一步的最优结果
+dp[i][1]=nums[i]+dp[i-1][0];//假定上一步没抢劫，本次抢劫了
+```
+
+我们假定nums数组为10,20,30,40,50
+
+dp数组就为：
+
+| 0    | 0    | 10   | 20   | 40   | 60   |
+| ---- | ---- | ---- | ---- | ---- | ---- |
+| 0    | 10   | 20   | 40   | 60   | 90   |
+
+我们可以看到每一列的最大值都是当前情况的最优解。所以最后return Math.max即可。
+
+# 2017-4-27
+
+## 开心数
+
+> 写一个算法来判断一个数，是否为开心数。开心数是这样定义的，从任何整数开始，将数字替换为整数的平方和，并重复该过程，知道数字等于1.注意：这里数字等于1的时候是陷入循环中，我们必须判断出循环并结束循环。
+
+> 如果我们使用集合来盛放这些数，那么一个数出现第二次就不能放进去了，可以有效解决循环问题。
+
+代码如下：
+
+```java
+public class Solution {
+    public boolean isHappy(int n) {
+        Set<Integer> inLoop = new HashSet<Integer>();//注意java中如何使用集合。
+    int squareSum,remain;
+	while (inLoop.add(n)) {//防止陷入死循环中，但结果不为1.
+		squareSum = 0;
+		while (n > 0) {
+		    remain = n%10;
+			squareSum += remain*remain;
+			n /= 10;
+		}
+		if (squareSum == 1)
+			return true;
+		else
+			n = squareSum;
+
+	}
+	return false;
+    }
+}
+```
+
+## 删除链表元素
+
+> 删除链表中所有元素再等于val的值。例如：链表1->2->6->3->4->5->6，返回1->2->3->4->5
+
+我们先给出递归的一种解法：
+
+代码如下：
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    public ListNode removeElements(ListNode head, int val) {
+            if (head == null) return null;
+        head.next = removeElements(head.next, val);
+        return head.val == val ? head.next : head;
+        
+    }
+}
+```
+
+下面再给出常规解法：
+
+代码如下：
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    public ListNode removeElements(ListNode head, int val) {
+          if (head == null) return null;
+    ListNode pointer = head;
+    while (pointer.next != null) {//剔除head.next中符合要求的元素。提出后仍是一个链表
+        if (pointer.next.val == val) pointer.next = pointer.next.next;
+        else pointer = pointer.next;
+    }
+    return head.val == val ? head.next : head;//判断head,返回表头。
+        
+    }
+}
+```
+
+## 计算质数
+
+> 计算小于n的非负整数中有多少质数。质数（prime number）又称[素数](http://baike.baidu.com/item/%E7%B4%A0%E6%95%B0)，有无限个。质数定义为在大于1的自然数中，除了1和它本身以外不再有其他[因数](http://baike.baidu.com/item/%E5%9B%A0%E6%95%B0)的数称为质数。
+
+这道题给定一个非负数n，让我们求小于n的质数的个数，题目中给了充足的提示，解题方法就在第二个提示[埃拉托斯特尼筛法Sieve of Eratosthenes](http://zh.wikipedia.org/wiki/%E5%9F%83%E6%8B%89%E6%89%98%E6%96%AF%E7%89%B9%E5%B0%BC%E7%AD%9B%E6%B3%95)中，这个算法的过程如下图所示，我们从2开始遍历到根号n，先找到第一个质数2，然后将其所有的倍数全部标记出来，然后到下一个质数3，标记其所有倍数，一次类推，直到根号n，此时数组中未被标记的数字就是质数。我们需要一个n-1长度的bool型数组来记录每个数字是否被标记，长度为n-1的原因是题目说是小于n的质数个数，并不包括n。
+ 然后我们用两个for循环来实现埃拉托斯特尼筛法，难度并不是很大
+
+如果一个数是另一个数的倍数，那这个数肯定不是素数。利用这个性质，我们可以建立一个素数数组，从2开始将素数的倍数都标注为不是素数。第一轮将4、6、8等表为非素数，然后遍历到3，发现3没有被标记为非素数，则将6、9、12等标记为非素数，一直到N为止，再数一遍素数数组中有多少素数。
+
+代码如下：
+
+```java
+public class Solution {
+    public int countPrimes(int n) {
+    
+        boolean[] notPrime = new boolean[n];
+        int count = 0;
+        for (int i = 2; i < n; i++) {
+            if (notPrime[i] == false) {
+                count++;
+                for (int j = 2; i*j < n; j++) {
+                    notPrime[i*j] = true;//把质数的所有倍数全部标注，置true,不是素数。
+                }
+            }
+        }
+        
+        return count;
+    }
+    }
+```
+
+## 字符串同构
+
+> 给定两个字符串s和t，确定他们是否是同构的。如果s中的字符可以被替换得到t，则两个字符串是同构的。字符的所有出现必须用另一个替换，同时保留字符的顺序。没有两个字符可能映射到同一个字符，但同一个字符可以应神自身。例如，
+> 给定“egg”，“add”，返回true。
+>
+> 给定“foo”，“bar”，返回false。
+
+哈希表法：我们用一个哈希表记录字符串s到字符串t之间的映射关系
+
+代码如下：
+
+```java
+public class Solution {
+    public boolean isIsomorphic(String s, String t) {
+          if(s == null || s.length() <= 1) return true;
+        HashMap<Character, Character> map = new HashMap<Character, Character>();//a->b
+        for(int i = 0 ; i< s.length(); i++){
+            char a = s.charAt(i);
+            char b = t.charAt(i);
+            if(map.containsKey(a)){//存在a-b的映射，判断映射规则是否与当前情况一致
+                 if(map.get(a).equals(b))
+                continue;
+                else
+                return false;
+            }else{//判断是否存在x->b的映射，不存在新增映射，否则返回false。
+                if(!map.containsValue(b))
+                map.put(a,b);
+                else return false;
+                
+            }
+        }
+        return true;
+    }
+}
+```
+
+注意这里的逻辑判断：首先我们假定我们的hashmap是映射s->t，我们得到a,b之后的判断思路是
+
+1. 是否存在a->b的映射，如果存在判断是否与当前情况一致，一致则继续判断，否则返回false
+2. 不存在a->b的映射，这时我们需要判断是否存在x->b的映射，如果存在，返回false;
+3. 不存在a->b，也不存在x->b，则新增记录。这是保证a,b都是新的，之前没有记录。
+
+注意：这里的x表示任意字符，不表示字符x.
+
+## 反转链表
+
+> 反转一个单链表
+
+这里我们使用一个递归算法来求解问题，代码如下：（注意体会这种思想）
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    public ListNode reverseList(ListNode head) {
+        if(head==null || head.next==null)
+            return head;
+        ListNode nextNode=head.next;
+        ListNode newHead=reverseList(nextNode);//递归
+        nextNode.next=head;
+        head.next=null;//调整head和head.next
+        return newHead;
+    }
+}
+```
+
+表结构也容易使用递归算法，如同lisp语言中一样。
