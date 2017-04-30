@@ -2302,3 +2302,222 @@ public class Solution {
 ```
 
 表结构也容易使用递归算法，如同lisp语言中一样。
+
+# 2017-4-30
+
+## 包含重复
+
+> 给定整数数组，查找数组是否包含任何重复项。如果数组中任何值至少重复出现两次则函数返回true。如果每个元素都不同，则返回false。
+
+> 最常规的方法是对数组两边遍历，判断数组中任何值如果出现狼次则函数返回true,否则返回false
+
+代码如下:
+
+```java
+ for(int i = 0; i < nums.length; i++) {
+            for(int j = i + 1; j < nums.length; j++) {
+                if(nums[i] == nums[j]) {
+                    return true;
+                }
+            }
+        }
+        return false;
+```
+
+但这种方法会超时，因此，我们考虑hashSet的特性，集合中元素均不重复，我们考虑遍历数组，同时加入hashset，还要判断元素是否已加入集合，若加入集合则返回true。否则最后返回false。
+
+代码如下：
+
+```java
+public class Solution {
+    public boolean containsDuplicate(int[] nums) {
+       /*  Set<Integer> set = new HashSet<Integer>();
+		 for(int i : nums)
+			 if(!set.add(i))// if there is same
+				 return true; 
+		 return false;*/
+		 /*for(int i = 0; i < nums.length; i++) {
+            for(int j = i + 1; j < nums.length; j++) {
+                if(nums[i] == nums[j]) {
+                    return true;
+                }
+            }
+        }
+        return false;*/
+        final Set<Integer> distinct = new HashSet<Integer>();
+    for(int num : nums) {
+        if(distinct.contains(num)) {//任意一个元素出现两次，则返回true
+            return true;
+        }
+        distinct.add(num);
+    }
+    return false;
+    }
+}
+```
+
+## 包含重复II
+
+> 给定一个数组和一个整数k，找到是否存在两不同的索引值i和j,使num[i]=num[j],并且i和j的绝对值差不大于k。
+
+> 这道题我们考虑使用hashmap的数据结构，
+
+代码如下：
+
+```java
+import java.util.HashMap;
+public class Solution {
+    public boolean containsNearbyDuplicate(int[] nums, int k) {
+        HashMap<Integer,Integer> map=new HashMap();
+        for(int i=0;i<nums.length;i++){
+            if(map.containsKey(nums[i])){
+                if(Math.abs((int)(i-map.get(nums[i])))<=k) return true;
+            }
+            map.put(nums[i],i);
+        }
+        return false;
+    }
+}
+```
+
+我们在这里在给出使用hashset的方法：
+
+```java
+public boolean containsNearbyDuplicate(int[] nums, int k) {
+        Set<Integer> set = new HashSet<Integer>();
+        for(int i = 0; i < nums.length; i++){
+            if(i > k) set.remove(nums[i-k-1]);//移除无关元素，使集合中永远只有k的元素，这时如
+          //果不能添加一定是找到满足条件的i和j。
+            if(!set.add(nums[i])) return true;
+        }
+        return false;
+ }
+```
+
+## 使用队列实现堆栈操作
+
+> 使用队列来实现堆栈操作，包括push,pop,top,empty
+
+代码如下：
+
+```java
+import java.util.ArrayDeque;
+public class MyStack {
+    private ArrayDeque<Integer> stack;
+    /** Initialize your data structure here. */
+    public MyStack() {
+       stack= new ArrayDeque<Integer>();
+    }
+    
+    /** Push element x onto stack. */
+    public void push(int x) {
+        stack.add(x);
+    }
+    
+    /** Removes the element on top of the stack and returns that element. */
+    public int pop() {
+        return stack.pollLast();
+    }
+    
+    /** Get the top element. */
+    public int top() {
+        return stack.getLast();
+    }
+    
+    /** Returns whether the stack is empty. */
+    public boolean empty() {
+        return stack.isEmpty();
+    }
+}
+
+/**
+ * Your MyStack object will be instantiated and called as such:
+ * MyStack obj = new MyStack();
+ * obj.push(x);
+ * int param_2 = obj.pop();
+ * int param_3 = obj.top();
+ * boolean param_4 = obj.empty();
+ */
+```
+
+## 反转二叉树
+
+> 树数据结构，我们依旧使用递归，但如何反转那，其实反转操作，也就是root.left=invertTree(root.right).
+
+代码如下：
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    public TreeNode invertTree(TreeNode root) {
+        if(root==null) return null;
+         TreeNode tmp = root.left;//临时变量，必不可少
+        root.left = invertTree(root.right);
+        root.right = invertTree(tmp);
+        return root;
+    }
+}//注意本体中，如何实现反转操作的
+```
+
+## 二的幂
+
+> 给定一个整数，写一个函数判断是否是2的幂
+
+> 我们使用一句话代码，并使用位操作
+
+代码如下：
+
+```java
+public class Solution {
+    public boolean isPowerOfTwo(int n) {
+        return ((n & (n-1))==0 && n>0);
+    }
+}
+```
+
+因为我们发现如下规律：
+
+```
+If n is the power of two:
+
+    n = 2 ^ 0 = 1 = 0b0000...00000001, and (n - 1) = 0 = 0b0000...0000.
+    n = 2 ^ 1 = 2 = 0b0000...00000010, and (n - 1) = 1 = 0b0000...0001.
+    n = 2 ^ 2 = 4 = 0b0000...00000100, and (n - 1) = 3 = 0b0000...0011.
+    n = 2 ^ 3 = 8 = 0b0000...00001000, and (n - 1) = 7 = 0b0000...0111.
+
+we have n & (n-1) == 0b0000...0000 == 0
+
+Otherwise, n & (n-1) != 0.
+
+For example, n =14 = 0b0000...1110, and (n - 1) = 13 = 0b0000...1101.
+```
+
+比较常规的做法如下：
+
+```java
+public class Solution {
+    public boolean isPowerOfTwo(int n) {
+       /*
+       //这个方法超时
+       int temp=1;
+        while(temp<n){
+            temp=temp<<1;
+        }
+        if(temp==n) return true;
+        return false;*/
+        /*return ((n & (n-1))==0 && n>0);//这个方法最简洁*/
+        if(n==0) return false;
+        while(n%2==0) n/=2;
+        return (n==1);
+    }
+}
+```
+
