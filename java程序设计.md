@@ -404,3 +404,89 @@ java中处理文本I/O： 使用Scanner类读取文本数据，使用PrintWriter
 二进制I/O不涉及编码和解码，因此比文本I/O更加高效。
 
 计算机并不区分二进制与文本文件。所有的文件都是以二进制形式来存储的，因此，从本质上讲，所有的文件都是二进制文件。文本I/O建立在二进制I/O的文件之上，它能提供一层抽象。用于字符层次的编码和解码。对于文本I/O而言，编码和解码是自动进行的。
+
+## 排序引论
+
+​      排序是一个常见又重要的任务，因而存在许多排序算法。本章将考虑一些基本排序程序，尽管大部分是针对整数排序的，但给出的java实现可以对任何可比对象进行排序----即任何实现了Comparable接口并定义了compareTo方法的类的对象。
+
+```
+编程小提示：
+为了使Comparable能用于任意类型，令Comparable<? super T> 代替Comparable<T>
++ 受限通配符
+在使用泛型时，通配符 ？ 可以表示任意类，可以使用以下两种方式中的一种来约束或者限制这个通配符。例如，？ super Gizmo 表示Gizmo的任意一个超类。我们就说Gizmo是通配符的下限。类似的，？ extends Gizmo表示Gizmo的任意子类。这里，Gizmo是通配符的上限。
+```
+
+### 选择排序
+
+选择排序的基本思想是：每趟在n-i+1(i=1,2,.....,n-1)个记录中选取关键字最小的记录作为有序序列中第i个记录。一趟简单选择排序的操作为：通过n-i次关键字间的比较，从n-i+1个记录中选择出关键字最小，并和第i个记录交换。
+
+代码如下：
+
+```java
+package test;
+
+public class SelectSort {
+public static void main(String[] args){
+	int[] nums=new int[]{2,34,6,78,9,0};
+	int index=0;
+	for(int i=0;i<nums.length;i++){
+		//寻找最小的，交换
+		int min=nums[i];
+		index=i;
+		for(int j=i;j<nums.length;j++){
+			if(min>nums[j]){
+				min=nums[j];
+				index=j;
+				//System.out.println(index);
+			}
+		}
+		//找到合适的元素，交换
+		int temp=nums[i];
+		nums[i]=nums[index];
+		nums[index]=temp;
+	}
+	for(int k:nums){
+		System.out.print(k+" ");
+	}
+}
+}
+
+```
+
+选择排序的时间复杂度为 $$ O(n^2) $$  ,空间复杂度为$$ O(n) $$ . 
+
+### 插入排序
+
+直接插入排序是一种最简单的排序方法，它的基本操作是将一个记录插入到排号需的有序列表中，从而得到一个新的、记录数增1的有序列表。
+
+代码如下：
+
+```java
+public static void insertOrder(int[] a,int start,int end){
+		if(start<end){
+			insertOrder(a,start,end-1);
+			insert(a[end],a,start,end-1);
+		}
+	}
+	public static void insert(int b,int[] a, int start,int end){
+		if(b>=a[end]){
+			a[end+1]=b;
+		}
+		else if(start<end){
+			a[end+1]=a[end];
+			insert(b,a,start,end-1);
+		}
+		else{//注意这种情况
+			a[end+1]=a[end];
+			a[end]=b;
+		}
+	}
+```
+
+我们使用递归来实现插入排序，inserOrder(int[] a,int start,int end),我们分两步来实现1. insertOrder(a,start,end-1)，使start到end-1 为有序。 2.insert(a[end],a,int start ,int end).即在排好序的数组插入最后一个数
+
+插入排序时间复杂度为$$ O(n^2) $$ ,
+
+### 链表的插入排序
+
+注：对链表的排序有可能困难，然而插入排序提供了一个合理的方法来完成这个任务。对链表进行表头插入，可以实现链表的有序。
