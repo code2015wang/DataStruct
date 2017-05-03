@@ -2521,3 +2521,115 @@ public class Solution {
 }
 ```
 
+# 2017-5-2
+
+## 用堆栈实现队列
+
+> 用栈实现具有以下操作的队列。push 、pop、peek、empty
+
+> 本题的难点在于，peek和pop函数的实现，因为stack先进后出的特性决定了如果不改变push函数，我们不能够轻易的得到队列的第一个元素。我们这里假设如果在push函数中，我们能在stack中实现push后的结果为1-2-3-4-5（第一次压栈1,第二次压栈2 ，依次类推）,这样peek和pop函数可以直接调用，stack的peek和pop函数。因此我们改写push函数，在push函数中我们需要一个中转的stack。
+
+代码如下：
+
+```java
+import java.util.Stack;
+public class MyQueue {
+public  Stack stack;
+    /** Initialize your data structure here. */
+    public MyQueue() {
+        stack=new Stack<Integer>();
+    }
+    
+    /** Push element x to the back of queue. */
+    public void push(int x) {
+       Stack<Integer> temp = new Stack<Integer>();
+    while(!stack.empty()){
+        temp.push((int)stack.pop());
+    }
+    stack.push(x);
+    while(!temp.empty()){
+        stack.push((int)temp.pop());
+    }
+    }
+    //push后的结果为1-2 （第一次压栈1,第二次压栈2），1为堆顶元素，2 为堆底元素。
+    /** Removes the element from in front of queue and returns that element.返回删除队列第一个元素并返回该元素 */
+    public int pop() {
+        
+        return (int)stack.pop();
+        
+    }
+    
+    /** Get the front element. 得到第一个元素*/
+    public int peek() {
+   
+       return (int)stack.peek();
+        
+    }
+    
+    /** Returns whether the queue is empty. */
+    public boolean empty() {
+        return stack.isEmpty();
+    }
+}
+
+/**
+ * Your MyQueue object will be instantiated and called as such:
+ * MyQueue obj = new MyQueue();
+ * obj.push(x);
+ * int param_2 = obj.pop();
+ * int param_3 = obj.peek();
+ * boolean param_4 = obj.empty();
+ */
+```
+
+## 回文链表
+
+> 给定一个单链表，确定它是否是回文链表。你能想到一个方法时间复杂度和空间复杂度维o(n)和o(1)
+
+代码如下：
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    public boolean isPalindrome(ListNode head) {
+  ListNode fast = head, slow = head;
+    while (fast != null && fast.next != null) {
+        fast = fast.next.next;
+        slow = slow.next;
+    }
+    if (fast != null) { // odd nodes: let right half smaller
+        slow = slow.next;
+    }
+    slow = reverse(slow);
+    fast = head;
+    
+    while (slow != null) {
+        if (fast.val != slow.val) {
+            return false;
+        }
+        fast = fast.next;
+        slow = slow.next;
+    }
+    return true;
+}
+
+public ListNode reverse(ListNode head) {
+    ListNode prev = null;
+    while (head != null) {
+        ListNode next = head.next;
+        head.next = prev;
+        prev = head;
+        head = next;
+    }
+    return prev;
+}
+}
+```
+
