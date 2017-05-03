@@ -2633,3 +2633,176 @@ public ListNode reverse(ListNode head) {
 }
 ```
 
+# 2017-5-3
+
+## 二叉搜索树最近共同祖先
+
+> 给定二叉搜索树（BST），找到BST中两个给定节点的最低共同祖先（LCA）。LCA的定义：“最小的共同祖先在节点v和w之间定义为T中具有v和w作为后代的最低节点。
+
+> 二叉查找树（二叉搜索树），它是一颗空树，或者具有下列性质的二叉树：若它的左子树不空，则左子树上所有节点的值均小于它的根节点上的值;若右子树不空，则右子树上的值均大于其根节点上的值;它的左右子树也是一颗二叉搜索树。
+
+> 首先根据二叉搜索树的定义，我们想到使用递归方法，但递归的条件是什么那，可以根据root.val ，p.val,q.val的关系来作为递归条件。若根节点的值小于两个节点的最小值，在递归在根节点的右子树寻找;若根节点的值大于两个节点的最大值，则递归的在根节点的左子树上寻找。否则返回根节点。
+
+代码如下：
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+         if(root.val<Math.min(p.val,q.val)) return lowestCommonAncestor(root.right,p,q);
+    if(root.val>Math.max(p.val,q.val)) return lowestCommonAncestor(root.left,p,q);
+    return root;
+    }
+}
+```
+
+## 删除单链表的某个节点
+
+> 编写一个函数来删除单链表的某个节点（除了未节点）。
+
+代码如下：
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    public void deleteNode(ListNode node) {
+         if(node != null && node.next != null) {
+            node.val = node.next.val;
+            node.next = node.next.next;
+           //覆盖掉该节点即可
+        }
+    }
+}
+```
+
+## 易位构词
+
+> 给定2个字符串s和t，编写一个函数判断t是否为s的易位构成。如 s="anagram"  t="nagaram" ,返回true。 s="rat",t="car",返回false.
+
+> 我们这样考虑，定义一个int数组alaphabet=new int[26];遍历s.对alaphabet[s.charAt(i)-'a']++,遍历t,对alaphabet[t.charAt(j)-'a']--.因为易位构词，使s和t字符一样，只是顺序不同，所以alaphabet数组每个元素均为0则是易位构词，否则不是。
+
+代码如下：
+
+```java
+public class Solution {
+    public boolean isAnagram(String s, String t) {
+        int[] alaphabet=new int[26];
+        for(int i=0;i<s.length();i++) alaphabet[s.charAt(i)-'a']++;
+        for(int j=0;j<t.length();j++) alaphabet[t.charAt(j)-'a']--;
+        for(int k=0;k<26;k++ ) if(alaphabet[k]!=0) return false;
+        return true;
+    }
+}
+```
+
+## 二叉树路径
+
+> 编写函数完成：给定一个二叉数，返回所有根节点到叶子节点的路径。
+
+> 树的数据结构，我们这里还是要考虑使用递归方法。
+
+代码如下:
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    public List<String> binaryTreePaths(TreeNode root) {
+        List<String> answer = new ArrayList<String>();
+    if (root != null) searchBT(root, "", answer);
+    return answer;
+}
+private void searchBT(TreeNode root, String path, List<String> answer) {
+    if (root.left == null && root.right == null) answer.add(path + root.val);
+    if (root.left != null) searchBT(root.left, path + root.val + "->", answer);
+    if (root.right != null) searchBT(root.right, path + root.val + "->", answer);
+}
+}
+//本题要注意结果的表示形式
+```
+
+##  数字加和
+
+> 给定一个非负整数，对该整数每位加和直到结果为一位数。如给定一个数38,过程如下：/3+8=11,1+1=2,结果为2.
+
+其实这个问题的结果是num对9取余而已，
+
+代码如下：
+
+```java
+public class Solution {
+    public int addDigits(int num) {
+        if (num == 0){
+            return 0;
+        }
+        if (num % 9 == 0){
+            return 9;
+        }
+        else {
+            return num % 9;
+        }
+    }
+}
+```
+
+一句话代码可以这样写：
+
+```java
+ublic class Solution {
+    public int addDigits(int num) {
+   return num==0?0:(num%9==0?9:(num%9));
+
+    }
+}
+```
+
+## 丑陋数字
+
+> 编写一个程序来检查一个给定的数字是否是一个丑陋数字。丑陋数字是整数，其素数因子只包括2,3,5.例如，6,8是丑陋的，而14不是，因为它还有因子7.但1通常认为是丑陋的。
+
+根据定义要求该数的因子只能是2,3,5,不可以是其他数，则为丑陋数否则不是。我们发现一个事实：如果num%2==0,则递归调用isUgly(num/2) 来判断是否维丑陋数字。如果num%3==0,则递归调用isUgly(num/3) 来判断是否维丑陋数字。如果num%5==0,则递归调用isUgly(num/5) 来判断是否维丑陋数字。再添加一些特殊情况就可实现完整的程序了。
+
+代码如下:
+
+```java
+public class Solution {
+    public boolean isUgly(int num) {
+        if(num<=0) return false;
+        if(num==1) return true;
+        if(num%2==0){
+            return isUgly(num/2);
+            
+        }
+        if(num%3==0){
+            return isUgly(num/3);
+        }
+        if(num%5==0){
+            return isUgly(num/5);
+        }
+        return false;
+    }
+}
+```
+
