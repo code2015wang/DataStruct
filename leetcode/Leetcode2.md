@@ -1,3 +1,5 @@
+
+
 # 2017-5-4
 
 ##  消失数字
@@ -159,4 +161,129 @@ public class NumArray {
  * int param_1 = obj.sumRange(i,j);
  */
 ```
+
+# 2017-5-6
+
+## nim 游戏
+
+> 你和你的朋友一起玩下面的nim游戏：在桌上有一堆石头，每次你们轮流去拿1到3块石头。拿到最后一块石头的人为胜利。每次开始时都是你拿石头。请实现一个函数来判断你是否能取胜。例如，如果由4块石头的话，你不可能赢，因为无论你拿几块石头，最后一定是你的朋友拿到最后一块。
+
+> 根据题目提示，在玩游戏的时候，第一个获得4的倍数的数字将失败，否则他将获胜。
+>
+> 基本情况当n=4时，总是第二个玩家胜利。
+>
+> 当4<n<8 时，第一个玩家拿走相应的数，将4留给第二个玩家则第一个玩家胜利。
+>
+> 现在到写一个循环的开始，n=8,无论第一个玩家拿走多少，4总会留给自己。因此只要判断总数是否是4的倍数即可。
+
+代码如下：
+
+```java
+public class Solution {
+    public boolean canWinNim(int n) {
+       return n % 4 != 0 ;
+    }
+}
+```
+
+## 3的幂
+
+> 给定一个整数，写一个函数来确定是否为3的幂。你能解决这个问题不使用循环或递归吗？
+
+代码如下：
+
+```java
+public class Solution {
+    public boolean isPowerOfThree(int n) {
+          // 1162261467 is 3^19,  3^20 is bigger than int  
+    return ( n>0 &&  1162261467%n==0);
+    }
+}
+```
+
+```java
+//递归的解法
+public boolean isPowerOfThree(int n) {
+    return n>0 && (n==1 || (n%3==0 && isPowerOfThree(n/3)));
+}
+```
+
+```java
+//循环的解法
+public boolean isPowerOfThree(int n) {
+    if(n>1)
+        while(n%3==0) n /= 3;
+    return n==1;
+}
+```
+
+或者用数学公式来求解
+
+```java
+public boolean isPowerOfThree(int n) {
+    return n==0 ? false : n==Math.pow(3, Math.round(Math.log(n) / Math.log(3)));
+}//注意这里需要取整。
+```
+
+## 2的幂
+
+> 快速判断一个数是否为2的幂
+
+> 将2的幂次方写成二进制形式后，很容易发现一个特点就是二进制中只有1个1,并且1后面的所有数为0,如果把这个数减1,你会发现只有那个1变成0,其余0变成1.这两数进行与运算你会发现为0.因此最快速的方法是
+>
+> (numbers& numbers-1)==0
+
+## 4的幂
+
+> 给定一个32位的整数，编写一个方法来测试它是否为4的幂
+
+代码如下：
+
+```java
+public class Solution {
+    public boolean isPowerOfFour(int num) {
+        return num > 0 && (num&(num-1)) == 0 && (num & 0x55555555) != 0;
+    }
+}
+```
+
+基本思想是：我们从2的幂开始，我们使用“n&(n-1)==0”来确定n是否为2的幂。然而4的幂我们需要加以限制。我们发现4的幂的二进制形式，唯一的“1”应该总位于技术的位置。如4^0=1,4^1=0100,所以我们可以使用"num&0X55555555==num"来检查“1”是否位于奇数位置。（0X55555555是16进制，5的二进制表示是0101（奇数为1）&操作之后如果是4的倍数则数值不变）
+
+## 字符串元音字母反转
+
+> 字符串作为输入输出字符串的元音字母之间反转后的字符串。如hello输出反转e和o之间的字母后的字符串holle.leetcode输出转后的字符串为leotcede.
+
+代码如下：
+
+```java
+public class Solution {
+public String reverseVowels(String s) {
+    if(s == null || s.length()==0) return s;
+    String vowels = "aeiouAEIOU";
+    char[] chars = s.toCharArray();
+    int start = 0;
+    int end = s.length()-1;
+    while(start<end){
+        
+        while(start<end && !vowels.contains(chars[start]+"")){
+            start++;
+        }
+        
+        while(start<end && !vowels.contains(chars[end]+"")){
+            end--;
+        }
+        
+        char temp = chars[start];
+        chars[start] = chars[end];
+        chars[end] = temp;
+        
+        start++;
+        end--;
+    }
+    return new String(chars);
+}
+}
+```
+
+> String 中的`contains(CharSequence s)`的参数为CharSequence ，因此代码中这样写：vowels.contains(chars[start]+"")。另外，String是java中的字符串，它继承CharSequence。CharSequence是一个接口。
 
