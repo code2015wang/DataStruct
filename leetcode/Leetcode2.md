@@ -71,3 +71,92 @@ public class Solution {
 }
 ```
 
+# 2017-5-5
+
+>Given a `pattern` and a string `str`, find if `str` follows the same pattern.
+>
+> Here **follow** means a full match, such that there is a bijection between a letter in `pattern` and a **non-empty** word in `str`.
+>
+>**Examples:**
+>
+>1. pattern = `"abba"`, str = `"dog cat cat dog"` should return true.
+>2. pattern = `"abba"`, str = `"dog cat cat fish"` should return false.
+>3. pattern = `"aaaa"`, str = `"dog cat cat dog"` should return false.
+>4. pattern = `"abba"`, str = `"dog dog dog dog"` should return false.
+
+代码如下：
+
+```java
+public class Solution {
+    public boolean wordPattern(String pattern, String str) {
+        String[] words = str.split(" ");
+    if (words.length != pattern.length())
+        return false;
+    Map index = new HashMap();
+    for (Integer i=0; i<words.length; ++i)
+        if (index.put(pattern.charAt(i), i) != index.put(words[i], i))
+            return false;
+    return true;
+    }
+}
+//第二种方法
+import java.util.Hashtable;
+public class Solution {
+    public boolean wordPattern(String pattern, String str) {
+        String[] arr = str.split(" ");
+        int len = pattern.length();
+        if(arr.length != len){
+            return false;
+        }
+        Hashtable<Character, String> table = new Hashtable<Character, String>();
+        for( int i = 0; i < len; i++){
+            char c = pattern.charAt(i);
+            if( table.containsKey(c) && !table.get(c).equals(arr[i])){
+                return false;
+            }
+            else if( !table.containsKey(c) && table.contains(arr[i])){
+                return false;
+            }
+            else{
+                table.put(c, arr[i]);
+            }
+        }
+        return true;
+    }
+}
+```
+
+## 范围求和
+
+> 给顶一个整数数组nums,找到索引i和j（i<=j）之间的元素之和，其中包括i和j。注意：1.假定数组不变。2.对sumrange函数可以多次调用。
+
+代码如下：
+
+```java
+public class NumArray {
+
+    private int[] sums;
+
+    public NumArray(int[] nums) {
+        if(nums.length != 0){
+            sums = new int[nums.length];
+        
+            sums[0] = nums[0];
+            for(int i=1; i<nums.length; i++){
+                sums[i] = nums[i] + sums[i-1];
+            }
+        }
+    }
+
+    public int sumRange(int i, int j) {
+        return i==0 ? sums[j] : sums[j]-sums[i-1];
+    }
+}
+
+/**
+ * Your NumArray object will be instantiated and called as such:
+ * NumArray obj = new NumArray(nums);
+ * int param_1 = obj.sumRange(i,j);
+ */
+```
+
