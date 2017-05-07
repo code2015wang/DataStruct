@@ -287,3 +287,295 @@ public String reverseVowels(String s) {
 
 > String 中的`contains(CharSequence s)`的参数为CharSequence ，因此代码中这样写：vowels.contains(chars[start]+"")。另外，String是java中的字符串，它继承CharSequence。CharSequence是一个接口。
 
+# 2017-5-7
+
+## 两个数组的交集
+
+> 给定两个数组，编写一个函数计算两个数组的交集。
+
+遍历数组，把交集存储在集合中，然后把集合转换成数组输出。
+
+代码如下：
+
+```java
+import java.util.HashSet;
+import java.util.Iterator;
+public class Solution {
+    public int[] intersection(int[] nums1, int[] nums2) {
+        HashSet<Integer> set=new HashSet();
+        for(int i=0;i<nums1.length;i++){
+            for(int j=0;j<nums2.length;j++){
+                if(nums1[i]==nums2[j]) {
+                    if(!set.contains(nums2[j])) set.add(nums2[j]);
+                }
+            }
+        }
+        int n=set.size();
+        int[] result=new int[n];
+        Iterator<Integer> iter=set.iterator();
+        int i=0;
+        while(iter.hasNext()){
+            result[i]=iter.next();
+            i++;
+        }
+        return result;
+    }
+}
+```
+
+同样的思路但是这样用空间复杂度代替实践复杂度
+
+代码如下：
+
+```java
+public class Solution {
+    public int[] intersection(int[] nums1, int[] nums2) {
+        Set<Integer> set = new HashSet<>();
+        Set<Integer> intersect = new HashSet<>();
+        for (int i = 0; i < nums1.length; i++) {
+            set.add(nums1[i]);
+        }
+        for (int i = 0; i < nums2.length; i++) {
+            if (set.contains(nums2[i])) {
+                intersect.add(nums2[i]);
+            }
+        }
+        int[] result = new int[intersect.size()];
+        int i = 0;
+        for (Integer num : intersect) {
+            result[i++] = num;
+        }
+        return result;
+    }
+}
+```
+
+这个复杂度更低，先排序然后在处理。
+
+代码如下：
+
+```java
+public class Solution {
+    public int[] intersection(int[] nums1, int[] nums2) {
+        Set<Integer> set = new HashSet<>();
+        Arrays.sort(nums1);
+        Arrays.sort(nums2);
+        int i = 0;
+        int j = 0;
+        while (i < nums1.length && j < nums2.length) {
+            if (nums1[i] < nums2[j]) {
+                i++;
+            } else if (nums1[i] > nums2[j]) {
+                j++;
+            } else {
+                set.add(nums1[i]);
+                i++;
+                j++;
+            }
+        }
+        int[] result = new int[set.size()];
+        int k = 0;
+        for (Integer num : set) {
+            result[k++] = num;
+        }
+        return result;
+    }
+}
+
+```
+
+## 数组交集II
+
+> 给定两个数组，编写函数来计算他们到交集。交集中数字可以重复。如num1=[1,2,2,1],nums2=[2,2],返回[2,2].
+
+思路同样，但这次我们使用list来存储中间结果。
+
+代码如下：
+
+```java
+import java.util.ArrayList;
+public class Solution {
+    public int[] intersect(int[] nums1, int[] nums2) {
+        ArrayList temp=new ArrayList<Integer>();
+        Arrays.sort(nums1);
+        Arrays.sort(nums2);
+        int i=0,j=0;
+        while(i<nums1.length&&j<nums2.length){
+            if(nums1[i]<nums2[j]) {
+                i++;
+            }else if(nums1[i]>nums2[j]){
+                j++;
+            }else{
+               temp.add(nums2[j]);
+               i++;
+               j++;
+               
+            }
+        }
+        int[] result=new int[temp.size()];
+        for(int k=0;k<temp.size();k++){
+            result[k]=(int)temp.get(k);
+        }
+        return result;
+    }
+}
+```
+
+## 验证平方
+
+> 给定一个数字，编写一个函数判断该数是否为平方数。请不要使用任何的sqrt()内置函数。
+
+我们发现任何一个等差数列的求和会是一个数的平方和。
+$$
+（1+3+5+7+......+(2n-1)）=n*(1+(2*n+1))/2=n^2
+$$
+所以代码如下：
+
+```java
+public class Solution {
+    public boolean isPerfectSquare(int num) {
+       /*  if (num < 1) return false;
+      for (int i = 1; num > 0; i += 2)
+        num -= i;
+      return num == 0;*/
+      if(num<1) return false;
+      for(int i=1;num>0;i=i+2){
+          num=num-i;
+      }
+      return num==0;
+    }
+}
+```
+
+## 计算两数和
+
+> 计算两数的和但不允许使用+和-
+
+代码如下：
+
+```java
+public class Solution {
+    public int getSum(int a, int b) {
+        return b==0? a:getSum(a^b, (a&b)<<1); //be careful about the terminating condition;
+    }
+}
+```
+
+位运算技巧：
+
+1. 计算给定二进制中1的个数
+
+代码如下：
+
+```java
+int count_one(int n){
+  while(n){
+    n=n&(n-1);//n&(n-1)不仅仅用于判断整数是否为2的幂
+    count++;
+  }
+  return conut;
+}
+```
+
+2. 是否是4的幂
+
+代码如下：（先判断是否是2的幂在验证1是否位于特殊位置）
+
+```java
+bool isPowerOfFour(int n){
+  return n>0&& n&(n-1)==0&& (n&0x55555555)!=0;
+}
+```
+
+3. 两数求和
+
+代码如下：
+
+```java
+int getSum(int a, int b) {
+    return b==0? a:getSum(a^b, (a&b)<<1); //be careful about the terminating condition;
+}
+```
+
+4. 找到丢失的数字
+
+代码如下：
+
+```java
+int missingNumber(vector<int>& nums) {
+    int ret = 0;
+    for(int i = 0; i < nums.size(); ++i) {
+        ret ^= i;
+        ret ^= nums[i];
+    }
+    return ret^=nums.size();
+}
+
+
+```
+
+5. 找到小于或等于给定数字的最大数字，并返回该数字的二进制形式。
+
+代码如下：
+
+```java
+long largest_power(long N) {
+    //changing all right side bits to 1.
+    N = N | (N>>1);
+    N = N | (N>>2);
+    N = N | (N>>4);
+    N = N | (N>>8);
+    N = N | (N>>16);
+    return (N+1)>>1;
+}
+
+
+```
+
+6. 反转32位无符号整数的二进制位。
+
+代码如下：
+
+```java
+uint32_t reverseBits(uint32_t n) {
+    unsigned int mask = 1<<31, res = 0;
+    for(int i = 0; i < 32; ++i) {
+        if(n & 1) res |= mask;
+        mask >>= 1;
+        n >>= 1;
+    }
+    return res;
+}
+```
+
+## 猜数游戏
+
+> 你现在在玩一个猜数游戏。这个游戏的规则如下：从1到n选择一个数，你需要猜出选择的这个数是多少。每次你猜错，我将告诉你你猜的是大或小。现编写一个函数，你需要多次调用guess()函数，guess（）返回-1，猜小了。1猜大了。0猜中了。这道题我们使用二分查找法。
+
+代码如下：
+
+```java
+/* The guess API is defined in the parent class GuessGame.
+   @param num, your guess
+   @return -1 if my number is lower, 1 if my number is higher, otherwise return 0
+      int guess(int num); */
+
+public class Solution extends GuessGame {
+    public int guessNumber(int n) {
+       int low=1,high=n;
+       while(low<high){
+           int mid=low+(high-low)/2;
+           if(guess(mid)==0) {
+               return mid;
+           }
+           else if(guess(mid)==1){
+               low=mid+1;
+           }else{
+               high=mid;
+           }
+       }
+       return low;
+    }
+}
+```
+
