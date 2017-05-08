@@ -579,3 +579,157 @@ public class Solution extends GuessGame {
 }
 ```
 
+# 2017-5-8
+
+## 赎金票据
+
+> 给定任意的赎金票据字符串和另一个票据字符串，包含任意字母的字母仓库。编写一个函数，如果能从字母仓库，构建赎金票据字符串则返回true。否则，返回false。如
+>
+> ```
+> canConstruct("a", "b") -> false
+> canConstruct("aa", "ab") -> false
+> canConstruct("aa", "aab") -> true
+> ```
+
+代码如下：
+
+```java
+public class Solution {
+    public boolean canConstruct(String ransomNote, String magazine) {
+         int[] arr = new int[26];
+        for (int i = 0; i < magazine.length(); i++) {
+            arr[magazine.charAt(i) - 'a']++;
+        }
+        for (int i = 0; i < ransomNote.length(); i++) {
+            if(--arr[ransomNote.charAt(i)-'a'] < 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+```
+
+## 字符串第一个特殊的字符
+
+> 给定一个字符串，找到第一个不重复的字符串返回它的序号。如果不存在，返回-1.
+
+> 我们发现字符串中第一个不重复的字符的一个特点是它的indexOF和lastIndexOf一致。因此可以使用嗯这个来判断
+
+代码如下：
+
+```java
+public class Solution {
+    public int firstUniqChar(String s) {
+       
+		char[] a = s.toCharArray();
+		
+		for(int i=0; i<a.length;i++){
+			if(s.indexOf(a[i])==s.lastIndexOf(a[i])){return i;}
+		}
+		return -1;
+}
+}
+```
+
+我们还可以使用另外一种方法，与上衣题的思路类似，用26个字母边生成临时数组，遍历字符串，对应字母计数。然后遍历临时数组，如果数组中哪个为1,就为要找的index。
+
+代码如下：
+
+```java
+public class Solution {
+    public int firstUniqChar(String s) {
+       
+	/*	char[] a = s.toCharArray();
+		
+		for(int i=0; i<a.length;i++){
+			if(s.indexOf(a[i])==s.lastIndexOf(a[i])){return i;}
+		}
+		return -1;*/
+		int[]  arr=new int[26];
+		for(int i=0;i<s.length();i++){
+		    arr[s.charAt(i)-'a']++;
+		}
+		for(int j=0;j<s.length();j++){
+		    if(arr[s.charAt(j)-'a']==1) return j;//注意这里如何判断==1的，
+          //注意这里是arr[s.charAt(j)-'a]==1而不是arr[j]==1
+	
+		}
+		return -1;
+}
+}
+```
+
+## 找到不同
+
+> 给定两个字符串s和t，他们仅包括小写字母。字符串t是由s随机生成并在任意位置加入一个字母。请找出t中增加加的字母。
+
+我们还延续上一题的思路：遍历计数然后验证
+
+代码如下：
+
+```java
+public class Solution {
+    public char findTheDifference(String s, String t) {
+        int[] arr=new int[26];
+        for(int i=0;i<t.length();i++){
+            arr[t.charAt(i)-'a']++;
+        }
+        for(int j=-0;j<s.length();j++){
+            arr[s.charAt(j)-'a']--;
+        }
+        for(int k=0;k<t.length();k++){
+            if(arr[t.charAt(k)-'a']!=0) return t.charAt(k);
+        }
+        return 0;
+    }
+}
+```
+
+我们还有个思路：利用^ 操作，因为1^1=0来得到最后结果。
+
+代码如下：
+
+```java
+public class Solution {
+    public char findTheDifference(String s, String t) {
+
+        char c = 0;
+	for (int i = 0; i < s.length(); ++i) {
+		c ^= s.charAt(i);
+	}
+	for (int i = 0; i < t.length(); ++i) {
+		c ^= t.charAt(i);
+	}
+	return c;
+    }
+}
+```
+
+## 第n位字符串
+
+> 将自然数序列看作一个长字符串，求第n位上的数字是多少？注意双位数是两个字符。
+
+代码如下：
+
+```java
+public class Solution {
+    public int findNthDigit(int n) {
+        int len = 1;
+		long count = 9;
+		int start = 1;
+
+		while (n > len * count) {
+			n -= len * count;
+			len += 1;
+			count *= 10;
+			start *= 10;
+		}
+
+		start += (n - 1) / len;
+		String s = Integer.toString(start);
+		return Character.getNumericValue(s.charAt((n - 1) % len));
+    }
+}
+```
+
