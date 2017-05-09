@@ -733,3 +733,407 @@ public class Solution {
 }
 ```
 
+# 2017-5-9
+
+## 二进制手表
+
+> 二进制表在顶部有4个LED，表示小时（0-11），底部的6个LED表示分钟(0-59).每个LED代表一个零或一个1.右边为最低有效位。给定一个非负整数n，表示当前开启状态的LED数量，返回手表可能代表的所有时间。注意：输出顺序无关紧要。小时不能包含前导0,例如“01：00”，应为“1：00”。分钟必须为两位数组成。例如“10：2”无效，要输出“10：02”。
+
+我们这里先来看一种解法：这个解法利用了bitset这个类，可他以将任意进制的数转换为二进制，而且用到了count函数，用来统计1的个数。那么时针从0遍历到11,分针从0遍历到59,让那后我们把时针的数组左移6位加上分针的数值，然后统计1的个数，即维量等的个数，那麽，我们遍历所有情况，当其等于num的时候，存入res中。代码如下：
+
+```java
+/*这里代码似乎有误，BitSet不是这样用的，但上面的思路是正确的*/
+class Solution {
+public:
+    vector<string> readBinaryWatch(int num) {
+        vector<string> res;
+        for (int h = 0; h < 12; ++h) {
+            for (int m = 0; m < 60; ++m) {
+                if (bitset<10>((h << 6) + m).count() == num) {
+                    res.push_back(to_string(h) + (m < 10 ? ":0" : ":") + to_string(m));
+                }
+            }
+        }
+        return res;
+    }
+};
+```
+
+下面同样的思路，但没有使用bitset类，代码如下：
+
+```java
+public class Solution {
+    public List<String> readBinaryWatch(int num) {
+        List<String> times = new ArrayList<>();
+    for (int h=0; h<12; h++){
+          for (int m=0; m<60; m++){
+              if(Integer.bitCount(h)+Integer.bitCount(m)==num){
+                  times.add(String.format("%d:%02d",h,m));
+              }
+          }
+    }
+      
+            /*if (Integer.bitCount(h * 64 + m) == num)//左移6位+m转换成二进制数然后计算1的个数
+                times.add(String.format("%d:%02d", h, m));*/
+    return times;     
+    }
+}
+```
+
+Java.lang.Integer.bitcount(int i) 返回用二进制补码表示i的1的个数。
+
+Java.lang.Integer.toBinaryString(int i) 把对应的整型数i转换成二进制（字符串）。
+
+对应还有toHexString(int i) 转换成16进制。toOctalString(int i) 转换成8进制。
+
+示例代码如下：
+
+```java
+package com.yiibai;
+
+import java.lang.*;
+
+public class IntegerDemo {
+
+   public static void main(String[] args) {
+
+     int i = 170;
+     System.out.println("Number = " + i);
+    
+     /* returns the string representation of the unsigned integer value 
+     represented by the argument in binary (base 2) */
+     System.out.println("Binary = " + Integer.toBinaryString(i));
+
+     // returns the number of one-bits 
+     System.out.println("Number of one bits = " + Integer.bitCount(i)); 
+   }
+} 
+```
+
+int numberOfLeadingZeros(int i) 给定一个int类型数据，返回这个数据的二进制串中从最左边算起连续的“0”的总数量。因为int类型的数据长度为32所以高位不足的地方会以“0”填充。
+
+nt numberOfTrailingZeros(int i) 给定一个int类型数据，返回这个数据的二进制串中从最右边算起连续的“0”的总数量。因为int类型的数据长度为32所以高位不足的地方会以“0”填充
+
+Integer decode(String nm) 给定一个10进制，8进制，16进制中任何一种进制的字符串，该方法可以将传入的字符串转化为10进制数字的Integer类型并返回。
+
++ java Bitset类
+
+一个Bitset类创建一种特殊leiixng的数组来保存位值。Bitset中数组大小会随着需求增加。这和位向量比较类似。BitSet示例：
+
+```java
+import java.util.BitSet;
+
+public class BitSetDemo {
+
+  public static void main(String args[]) {
+     BitSet bits1 = new BitSet(16);
+     BitSet bits2 = new BitSet(16);
+      
+     // set some bits
+     for(int i=0; i<16; i++) {
+        if((i%2) == 0) bits1.set(i);
+        if((i%5) != 0) bits2.set(i);
+     }
+     System.out.println("Initial pattern in bits1: ");
+     System.out.println(bits1);
+     System.out.println("\nInitial pattern in bits2: ");
+     System.out.println(bits2);
+
+     // AND bits
+     bits2.and(bits1);
+     System.out.println("\nbits2 AND bits1: ");
+     System.out.println(bits2);
+
+     // OR bits
+     bits2.or(bits1);
+     System.out.println("\nbits2 OR bits1: ");
+     System.out.println(bits2);
+
+     // XOR bits
+     bits2.xor(bits1);
+     System.out.println("\nbits2 XOR bits1: ");
+     System.out.println(bits2);
+  }
+}
+```
+
+输出:
+
+```java
+Initial pattern in bits1:
+{0, 2, 4, 6, 8, 10, 12, 14}
+
+Initial pattern in bits2:
+{1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 14}
+
+bits2 AND bits1:
+{2, 4, 6, 8, 12, 14}
+
+bits2 OR bits1:
+{0, 2, 4, 6, 8, 10, 12, 14}
+
+bits2 XOR bits1:
+{}
+```
+
+BitSet可以用来存储海量数据：
+
+[Java](http://lib.csdn.net/base/javase).util.BitSet可以按位存储。
+计算机中一个字节（byte）占8位（bit），我们java中数据至少按字节存储的，
+比如一个int占4个字节。
+如果遇到大的数据量，这样必然会需要很大存储空间和内存。
+如何减少数据占用存储空间和内存可以用[算法](http://lib.csdn.net/base/datastructure)解决。
+java.util.BitSet就提供了这样的算法。
+比如有一堆数字，需要存储，source=[3,5,6,9]
+用int就需要4*4个字节。
+java.util.BitSet可以存true/false。
+如果用java.util.BitSet，则会少很多，其原理是：
+1，先找出数据中最大值maxvalue=9
+2，声明一个BitSet bs,它的size是maxvalue+1=10
+3，遍历数据source，bs[source[i]]设置成true.
+最后的值是：
+(0为false;1为true)
+bs [0,0,0,1,0,1,1,0,0,1]
+                3,   5,6,       9
+
+这样一个本来要int型需要占4字节共32位的数字现在只用了1位！
+比例32:1  
+这样就省下了很大空间。
+
++  java中BitSet
+
+java中BitSet就是位图数据结构，根据位图的语义，数据的存在性可以使用bit位上1或0来表示，一个bit具有2个值：0和1,正好可以用来表示true和false。对于判断“数据是否存在”的场景，我们通常使用hashmap来存储，不过hashmap这个数据结构需要消耗较多的内存，不适合保存较多的数据，即大叔据场景。比如在10亿条URl记录中判定一个“www.baidu.com/a”是否存在。如果我们使用bitset来保存，那麽可以对一条url求hashcode，并将数字映射到bitset上，那麽事实上它h只需要一个bitset即可，即我们1位空间即可表达一个URl字符串的存在性。
+
+    1) BitSet只面向数字比较，比如set(int a,boolean value)方法，将数字a在bitSet中设定为true或者false；此后可以通过get(int a)方法检测结果。对于string类型的数据，如果像使用BitSet，那么可以将其hashcode值映射在bitset中。
+
+    2) 首先我们需要知道：1，1<<64，1<<128，1<<192...等，这些数字的计算结果是相等的（位运算）；这也是一个long数字，只能表达连续的(或者无冲突的)64个数字的状态，即如果把数字1在long中用位表示，那么数字64将无法通过同一个long数字中位表示--冲突；BitSet内部，是一个long[]数组，数组的大小由bitSet接收的最大数字决定，这个数组将数字分段表示[0,63],[64,127],[128,191]...。即long[0]用来存储[0,63]这个范围的数字的“存在性”，long[1]用来存储[64,127]，依次轮推，这样就避免了位运算导致的冲突。
+
+   3）bitSet内部的long[]数组是基于向量的，即随着set的最大数字而动态扩展。数组的最大长度计算：
+
+```
+(maxValue - 1) >> 6  + 1  
+```
+
+   4）使用bitset做字符串的存在性检验
+
+```java
+    BitSet bitSet = new BitSet(Integer.MAX_VALUE);//hashcode的值域  
+      
+    //0x7FFFFFFF  
+    String url = "http://baidu.com/a";  
+    int hashcode = url.hashCode() & 0x7FFFFFFF;  
+    bitSet.set(hashcode);  
+      
+    System.out.println(bitSet.cardinality());//着色位的个数  
+    System.out.println(bitSet.get(hashcode));//检测存在性  
+    bitSet.clear(hashcode);//清除位数据  
+```
+
+   5）BloomFilter（布隆姆过滤器）
+
+ BloomFilter 的设计思想和BitSet有较大的相似性，目的也一致，它的核心思想也是使用多个Hash算法在一个“位图”结构上着色，最终提高“存在性”判断的效率。请参见Guava  BloomFilter。如下为代码样例：
+
+```java
+    Charset charset = Charset.forName("utf-8");  
+    BloomFilter<String> bloomFilter = BloomFilter.create(Funnels.stringFunnel(charset),2<<21);//指定bloomFilter的容量  
+    String url = "www.baidu.com/a";  
+    bloomFilter.put(url);  
+    System.out.println(bloomFilter.mightContain(url));  
+```
+
+ 一道题：1千万个随机数，随机数的范围在1到1亿直接按，现在要求写出一道算法，将1到1亿没有出现在随机数里的数据找出来？
+
+代码如下：
+
+```java
+
+public class Alibaba
+{
+    public static void main(String[] args)
+    {
+        Random random=new Random();
+        
+        List<Integer> list=new ArrayList<>();
+        for(int i=0;i<10000000;i++)
+        {
+            int randomResult=random.nextInt(100000000);
+            list.add(randomResult);
+        }
+        System.out.println("产生的随机数有");
+        for(int i=0;i<list.size();i++)
+        {
+            System.out.println(list.get(i));
+        }
+        BitSet bitSet=new BitSet(100000000);
+        for(int i=0;i<10000000;i++)
+        {
+            bitSet.set(list.get(i));
+        }
+        
+        System.out.println("0~1亿不在上述随机数中有"+bitSet.size());
+        for (int i = 0; i < 100000000; i++)
+        {
+            if(!bitSet.get(i))
+            {
+                System.out.println(i);
+            }
+        }     
+    }
+}
+```
+
+## 布隆过滤器
+
+布隆过滤器的作用是加速判断一个元素是否在集合中出现的方法。因为其主要过滤了大部分元素间的精确匹配，故称过滤器。其应用场景为需要频繁在一个海量的集合中查找某个元素是否存在。
+
+例如：
+
+假设有一些字符串，假设有一个字符串a，要在集合B中查找其是否在集合B中。最笨的方法是遍历集合B中的每个元素bi，精确匹配a是否等于bi。若集合B中有N个元素，则最坏情况下需要执行N次精确匹配。
+
+一个改进的方法是将a和B中每个字符串按照特定规则映射为数字，**称为hash值**。规则可以任意设置。比如取各字符串的首字母和尾字母的编码之乘积，取奇数个字符的编码执行异或，等。将比较字符串问题变成一个比较数字的问题。比较字符串需要从头到尾比较，而数字的比较会快很多。
+
+需要注意的是，当两个字符串相同时，采用相同的映射规则得到的数字一定相同。但当两个字符串不同时，得到的字符串不一定不同。所以，当我们发现两个字符串的**hash值**相同时，两个字符串不一定相同，所以需要进一步去精确匹配两个字符串是否相同。但采用hash值方法已经能够过滤掉一部分以前需要精确匹配的计算量。仅当hash值相同（假设hash值通过字符串首尾字母计算得来，则当两个字符串首尾字母相同时hash值相同）时才去比较字符串本身。若选择hash值合理，则性能将大幅提高。
+
+布隆过滤器通过将一个字符串使用多个不同的hash值计算方法，映射为多个不同的hash值，当所有这些hash值完全相同时，才认为两个字符串相同。从而进一步降低了放生hash值相同的可能性，从而进一步提高了过滤的性能。
+
+布隆过滤器是由巴顿*布隆于1970年提出的。它实际上是一个很长的二进制向量和一系列随机映射函数。我们通过上面的例子来说明起工作原理。
+
+假定我们存储一亿个电子邮件地址，我们先建立一个十六亿二进制（比特），即两亿字节的向量，然后将这十六亿个二进制全部设置为零。对于每一个电子邮件地址
+ X，我们用八个不同的随机数产生器（F1,F2, ...,F8） 产生八个信息指纹（f1, f2, ..., f8）。再用一个随机数产生器 G 
+把这八个信息指纹映射到 1 到十六亿中的八个自然数 g1, g2, ...,g8。现在我们把这八个位置的二进制全部设置为一。当我们对这一亿个 
+email 地址都进行这样的处理后。一个针对这些 email 地址的布隆过滤器就建成了
+
+代码如下：
+
+```java
+/*布隆过滤器（Bloom Filter）是1970年由Burton Howard Bloom提出的。
+*它实际上是一个很长的二进制向量和一系列随机映射函数。
+*布隆过滤器可以用于检索一个元素是否在一个集合中。
+*它的优点是空间效率和查询时间都远远超过一般的算法，缺点是有一定的误识别率和删除困难。
+*/
+
+import java.util.BitSet;
+
+public class SimpleBloomFilter { 
+
+      private static final int DEFAULT_SIZE = 2 << 64;
+      private static final int[] seeds = new int[] { 7, 113, 213, 3111, 397, 611,532 };  //不同的函数seed
+      private BitSet bits = new BitSet(DEFAULT_SIZE);
+
+      private SimpleHash[] func = new SimpleHash[seeds.length];   //func 函数数组
+       
+      public SimpleBloomFilter() {
+          for (int i = 0; i < seeds.length; i++) func[i] = new SimpleHash(DEFAULT_SIZE, seeds[i]);   //初始化func函数数组
+      } 
+
+       public static class SimpleHash { 
+           
+     	  private int cap; 
+          private int seed;
+          public SimpleHash(int cap, int seed) { 
+               this.cap = cap;
+               this.seed = seed;  
+           } 
+
+	       public int hash(String value) {
+	            int result = 0;
+	            int len = value.length(); 
+	           for (int i = 0; i < len; i++)result = seed * result + value.charAt(i); //一般的hash算法
+	           return (cap - 1) & result;   //把值的范围控制在cap内
+	       }
+       } 
+       
+      
+      public void add(String url) {    //bloom filter 添加url值
+          for (SimpleHash f : func)bits.set(f.hash(url), true); 
+     }      
+
+      public boolean contains(String value) {   //判断 bloom filter 是否包含url值
+         if (value == null) {return false;}
+         boolean ret = true; 
+         for (SimpleHash f : func)ret = ret && bits.get(f.hash(value));
+         return ret;
+       }
+       
+      
+       public static void main(String[] args) { 
+           String[] urls = new String[]{"www.example.com","www.renren.com","www.baidu.com","www.baidu.com"};  //测试数据
+           SimpleBloomFilter filter = new SimpleBloomFilter(); 
+           for(String value : urls){
+        	   value = value.trim();
+	           System.out.println("filter.contains("+value+"):"+filter.contains(value));
+	           filter.add(value); 
+	           System.out.println("filter.add("+value+"):"+filter.contains(value));
+	           System.out.println("----------------------------------------------------");
+	        }
+       }
+       
+} 
+```
+
+bitset的一个例子
+
+```java
+package test;
+import java.util.BitSet;
+public class WhichChars {
+   private BitSet used = new BitSet();
+   public WhichChars(String str){
+      for(int i=0;i< str.length();i++)
+        used.set(str.charAt(i));  // set bit for char
+   }
+    public String toString(){
+         String desc="[";
+         int size=used.size();
+         System.out.println("size:"+size);
+          for(int i=0;i< size;i++){
+        	
+             if(used.get(i)){
+            	 
+            
+            	 
+                 desc+=(char)i;
+            
+             }
+            }
+             return desc+"]";
+         }
+    public static void main(String args[]){
+        WhichChars w=new WhichChars("How do you do");
+        System.out.println(w);
+    }
+   }
+```
+
+## 左子树之和
+
+> 找到一个二叉树的所有左子树之和
+
+代码如下：
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    public int sumOfLeftLeaves(TreeNode root) {
+        if(root == null) return 0;
+    int ans = 0;
+    if(root.left != null) {
+        if(root.left.left == null && root.left.right == null) ans += root.left.val;
+        else ans += sumOfLeftLeaves(root.left);
+    }
+    ans += sumOfLeftLeaves(root.right);
+    
+    return ans;
+        
+    }
+}
+```
+
