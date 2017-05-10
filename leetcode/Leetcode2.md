@@ -1137,3 +1137,148 @@ public class Solution {
 }
 ```
 
+# 2017-5-10
+
+## 整数转换为16进制
+
+> 编写一个函数实现，把一个整数转换为16进制的数，负整数使用二进制的补码。
+
+代码如下：
+
+```java
+public class Solution {
+    public String toHex(int num) {
+        return Integer.toHexString(num);
+    }
+}
+```
+
+另外一种方法：
+
+```java
+/*
+Basic idea: each time we take a look at the last four digits of
+            binary verion of the input, and maps that to a hex char
+            shift the input to the right by 4 bits, do it again
+            until input becomes 0.
+            
+            每次我们看看最后四位数字
+             二进制verion的输入，并将其映射到十六进制字符
+             将输入向右移动4位，再次执行
+             直到输入变为0。
+
+*/
+
+public class Solution {
+    
+    char[] map = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+    
+    public String toHex(int num) {
+        if(num == 0) return "0";
+        String result = "";
+        while(num != 0){
+            result = map[(num & 15)] + result; 
+            num = (num >>> 4);
+        }
+        return result;
+    }
+    
+    
+}
+```
+
+## 最长回文
+
+> 给定一个由小写或大写字母组成的字符串，找到可以用这些字母构建的最长的回文长度。
+
+我们这里可以利用hashset的特性（没有重复元素），遍历字符串，依次存入hashset。如果集合中已存在则计数加一，同时把元素从集合中移除，否则加入集合。最后判断集合是否为空，如果为空则最长为计数的2倍;否则为计数的2倍加1.注意这里集合不为空的话，集合中不一定只有一个元素，所以不能用集合的size来计算最长回文长度。这里只能使用我们自己的计数来计算。
+
+代码如下：
+
+```java
+import java.util.HashSet;
+public class Solution {
+    public int longestPalindrome(String s) {
+        if(s==null||s.length()==0) return 0;
+        int conut=0;
+        HashSet set=new HashSet<String>();
+        for(int i=0;i<s.length();i++){
+            if(set.contains(s.charAt(i))){
+                conut++;
+                set.remove(s.charAt(i));
+            }else{
+                set.add(s.charAt(i));
+            }
+            
+        }
+        if(!set.isEmpty()) return 2*conut+1;
+        return 2*conut;
+    }
+}
+```
+
+## Fizz  Buzz
+
+> 编写一个程序，输出数字的字符串表示从1到n。但对于3的倍数，它因该输出Fizz而不是数字;对于5的倍数输出Buzz。对于是3和5的倍数输出FizzBuzz。
+
+代码如下：
+
+```java
+import java.util.ArrayList;
+public class Solution {
+    public List<String> fizzBuzz(int n) {
+        List result=new ArrayList<String>();
+        for(int i=1;i<=n;i++){
+            if(i%3==0&&i%5!=0) result.add("Fizz");
+            else if(i%5==0&&i%3!=0) result.add("Buzz");
+            else if(i%3==0&&i%5==0) result.add("FizzBuzz");
+            else result.add(Integer.toString(i));
+        }
+        return result;
+    }
+}
+```
+
+## 第三大数
+
+> 给定一个整型数组，返回第三大的数字，如果该数字不存在，则返回最大梳子。要求时间复杂度为o(n).
+
+java优先队列中元素可以默认自然排序或者通过提供的Comparator在队列实例化时排序。优先队列的头是基于自然排序或comparator排序的最小元素。我们如果使用优先队列的话，只需要把队列的第三个元素输出即可。另外这里还有点技巧的处理（由于最大和第三大元素有用，因此我们需要对队列进行处理，根据size的大小使用poll依次从队首删除元素，只保留有用元素），具体代码：
+
+代码如下：
+
+```java
+public class Solution {
+    public int thirdMax(int[] nums) {
+         PriorityQueue<Integer> pq = new PriorityQueue<>();//优先队列
+        Set<Integer> set = new HashSet<>();//set过滤重复元素
+        for (int i : nums) {
+            if (!set.contains(i)) {
+                pq.offer(i);
+                set.add(i);
+                if (pq.size() > 3) {
+                    set.remove(pq.poll());//pq.roll()从队首开始依次删除元素
+                }//保证优先队列永远只有最大的三个，且第三大在队首
+              //注意这里，我们必须要在这里进行>3的判断，因为如果存在多个元素一样的话，可能第三大
+              //的元素就是该元素，因此需要在pq和set中都做处理，之后才能决定是否在set中添加元素。
+              //我们不能在都加入pq之后做>3的处理，这样会得到求解不正确的结果。
+            }
+        }
+        if (pq.size() < 3) {//如果不存在第三大元素
+            while (pq.size() > 1) {
+                pq.poll();//pq中只剩最大的一个
+            }
+        }
+        return pq.peek();//返回队首元素
+    }
+}
+
+  /* int len=nums.length;
+        Arrays.Sort(nums);
+        if(nums.length>3) return nums[len-3];
+        return nums[len];
+        //不能使用这个因为有多个元素是一样的话，这样写得不到正确的结果。这也是为什么要使用set
+        //的原因。
+        */
+```
+
