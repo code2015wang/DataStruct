@@ -1282,3 +1282,160 @@ public class Solution {
         */
 ```
 
+# 2017-5-11
+
+## 字符串相加
+
+> 给定两个非负的整数num1和num2把他们看作字符串，返回num1+num2。注意：
+>
+> 1. num1和num2的长度都是<5100
+> 2. num1和num2都只包含数字0-9
+> 3. num1和num2都不包含任何前导零
+> 4. 不得使用任何内置的BigInteger库或直接将输入转换为整数
+
+这道题是用字符串来实现十进制加法，和前面用字符串实现二进制加法类似，代码如下：
+
+```java
+public class Solution {
+    public String addStrings(String num1, String num2) {
+        int len1=num1.length()-1;
+        int len2=num2.length()-1;
+        StringBuilder sb=new StringBuilder();
+        int sum=0,carry=0;
+        while(len1>=0||len2>=0){//注意有等号
+            int first=len1>=0?num1.charAt(len1)-'0':0;//注意有等号
+            int sencond=len2>=0?num2.charAt(len2)-'0':0;
+            sum=carry+first+sencond;
+            if(sum<=9){
+                sb.insert(0,sum);
+                sum=0;
+                carry=0;
+            }else{
+                sb.insert(0,sum%10);
+                sum=0;
+                carry=1;
+            }
+            len1--;
+            len2--;
+        }
+        if(carry==1) sb.insert(0,"1");
+        return sb.toString();
+    }
+}//注意这道题的逻辑思路
+```
+
+## 字符串中段数
+
+> 计算字符串中的段数，其段数的定义为非空格字符的连续序列。注意，字符串不包含任何不可打印的字符。
+
+这道题我们很容易想到使用split函数，但需要做点预处理及使用合适的正则表达式
+
+代码如下：
+
+```java
+public class Solution {
+    public int countSegments(String s) {
+      String trimmed = s.trim();
+    if (trimmed.length() == 0) return 0;
+    else return trimmed.split("\\s+").length;
+
+    }
+}
+```
+
+正则表达式中 ”\\\s“ 表示空格 ，回车，换行等空白符  +号表示一个或多个的意思。
+
+## 路径和
+
+> 给定一个二叉树，该二叉树每个节点都是整型数。给定一个整数，找到所有的路径。这个路径不需要从根节点开始，但必须是从父节点到子节点。该树有不多于1000个节点，节点数值范围为-1000000到1000000.
+
+关于这个问题，我们可以分三种情况来考虑：1.从根节点来寻找 2.从根节点的左子树来寻找 3. 从根节点的右子树来寻找。在寻找的是时候使用递归方法，我们可以定义寻找方法为pathSumFrom。代码如下：
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    public int pathSum(TreeNode root, int sum) {
+        
+    if (root == null) return 0;
+        return pathSumFrom(root, sum) + pathSum(root.left, sum) + pathSum(root.right, sum);//分别从根节点，根节点左子树，根节点右子树来寻找
+    }
+    
+    private int pathSumFrom(TreeNode node, int sum) {
+        if (node == null) return 0;
+        return (node.val == sum ? 1 : 0) 
+            + pathSumFrom(node.left, sum - node.val) + pathSumFrom(node.right, sum - node.val);
+            /*在寻找方法里，递归调用。pathSum调用 pathSumFrom。pathSumFrom调用自身。如果node.val==sum即找到一条路径*/
+    }
+}
+```
+
+## 查找字符串中所有匹配（顺序可以不一样）
+
+> 给定一个字符串s和一个非空字符串p，在s中找到所有p开始的索引。字符串仅由小写英文字母组成，字符串s和p的长度不得大于20100.例如：
+>
+> ```
+> Input:
+> s: "cbaebabacd" p: "abc"
+>
+> Output:
+> [0, 6]
+>
+> Explanation:
+> The substring with start index = 0 is "cba", which is an anagram of "abc".
+> The substring with start index = 6 is "bac", which is an anagram of "abc".
+> ```
+>
+> ```
+> Input:
+> s: "abab" p: "ab"
+>
+> Output:
+> [0, 1, 2]
+>
+> Explanation:
+> The substring with start index = 0 is "ab", which is an anagram of "ab".
+> The substring with start index = 1 is "ba", which is an anagram of "ab".
+> The substring with start index = 2 is "ab", which is an anagram of "ab".
+> ```
+
+代码如下：
+
+```java
+import java.util.ArrayList;
+public class Solution {
+    public   List<Integer> findAnagrams(String s, String p) {
+      ArrayList<Integer> result=new ArrayList();
+	        if(s==null||s.length()==0||p==null||p.length()==0) return result;
+	        int[] hash=new int[256];
+	        for(char c :p.toCharArray()){
+	            hash[c]++;//将p中字符集其个数做统计
+	        }
+	        int right=0,left=0,count=p.length();
+	        while(right<s.length()){//遍历s，同时对hash数组进行处理，
+	        if(hash[s.charAt(right++)]-->=1) count--;//s中的字符在p中出现
+	        /*上面一句话和下面等效
+	        
+	         if(hash[s.charAt(right)]>=1){
+	        	count--;//s中的字符在p中出现
+	        	hash[s.charAt(right)]--;
+	        	right++;
+	        	//hash[s.charAt(right)]--;
+	        }
+	        */
+	        if(count==0) result.add(left);
+	        if (right - left == p.length() && hash[s.charAt(left++)]++ >= 0) count++;  
+              //注意这句，很重要
+	        }
+	        return result;
+}
+}
+```
+
