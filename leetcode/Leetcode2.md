@@ -1439,3 +1439,156 @@ public class Solution {
 }
 ```
 
+# 2017-5-14
+
+## 排硬币
+
+> 你有n个硬币，你想给它排成一个梯形，满足在k行有k个。给定非负整数n，编写函数返回满足条件的k。
+>
+> 如n=5,5=1+2+2,最后一行只排2个不满足条件因此函数将返回2.
+
+> 问题相当于求解$$ n=(x+1)x/2 $$   ,根据公式法求解 ：$$ x_1 = \frac{-b+\sqrt{b^2-4ac}}{2a} $$  $$ x_2=-\frac{-b-\sqrt{b^2-4ac}}{2a} $$ 
+>
+> 在求解方程中 a=1 b=1 c=-2n，可以看到 $$ x= \frac{-1+\sqrt{1-8n}}{2} $$ 
+>
+> 所以代码如下：
+
+```java
+public class Solution {
+    public int arrangeCoins(int n) {
+        return (int) ((Math.sqrt(1 + 8.0 * n) - 1) / 2);
+    }
+}
+```
+
+# 2017-5-16
+
+##  元组数量
+
+> 给定平面上的n个点都是成对不同的。我们需要找到的元组是（i，j，k）使i与k，i与j之间的距离相等。编写函数实现返回符合条件元组的个数。
+
+代码如下：
+
+```java
+public class Solution {
+    public int numberOfBoomerangs(int[][] points) {
+     if(points.length==0 || points[0].length==0) return 0;
+        int ret = 0;
+        for(int i=0;i<points.length;i++){
+            Map<Integer, Set<int[]>> map = new HashMap<>();
+            int[] p = points[i];
+            for(int j=0;j<points.length;j++){
+                if(j==i) continue;
+                int[] q = points[j];
+                int dis = getDis(p, q);
+                if(!map.containsKey(dis)) map.put(dis, new HashSet<int[]>());
+                map.get(dis).add(q);
+            }
+            for(Integer key : map.keySet()){
+                int size = map.get(key).size();
+                if(size>=2) ret += (size*(size-1));
+            }
+        }
+        return ret;
+    }
+    public int getDis(int[] p, int[] q){
+        int a = p[0]-q[0];
+        int b = p[1]-q[1];
+        return a*a+b*b;
+    }
+}
+```
+
+## 找出数组中消失的数字
+
+> 给定一个整数数组，其中1<=a[i]<=n,(n=数组大小)，某些元素出现两次，而其他元素出现一次。找到不出现在在这个数组的中的[1,n]包含的所有元素。
+
+这个我们使用BItSet来解决这个问题，代码如下：
+
+```java
+import java.util.BitSet;
+import java.util.ArrayList;
+public class Solution {
+    public List<Integer> findDisappearedNumbers(int[] nums) {
+        BitSet set=new BitSet(nums.length);
+        ArrayList list=new ArrayList();  
+        for(int i:nums){
+            set.set(i);
+        }
+        for(int i=1;i<=nums.length;i++){
+            if(!set.get(i)){
+                list.add(i);
+            }
+        }
+        return list;
+    }
+}
+```
+
+## 使数组元素相等的最小移动数
+
+> 给定大小为n的非空整数数组，中哦到所有使数组元素相等所需的最小移动数。
+
+代码如下：
+
+```java
+public class Solution {
+    public int minMoves(int[] nums) {
+         if (nums.length == 0) return 0;
+        int min = nums[0];
+        for (int n : nums) min = Math.min(min, n);
+        int res = 0;
+        for (int n : nums) res += n - min;
+        return res;
+    }
+}
+```
+
+## 分配蛋糕
+
+> 假定你是一个非常好的父母，你需要给你的孩子分配饼干并且每个孩子至少要分配一个饼干。每个孩子心里有个贪心指数$$ g_i $$，这是他对饼干的最低要求，你必须要满足这个条件。饼干j有个尺寸$$ s_j $$ ,如果$$ s_j >= g_j  $$ 
+>
+> 那麽我们可以给孩子分配这个饼干。
+
+代码如下：
+
+```java
+public class Solution {
+    public int findContentChildren(int[] g, int[] s) {
+       Arrays.sort(g);
+Arrays.sort(s);
+int i = 0;
+for(int j=0;i<g.length && j<s.length;j++) {
+	if(g[i]<=s[j]) i++;
+}
+return i; 
+    }
+}
+```
+
+## 重复子串
+
+> 给定一个非空字符串，检查它是否可以通过获取一个子字符串并将子字符串的多个副本附加在一起构造。假定给定的字符串仅由小写的英文字母组成，其长度不会超过10000.
+
+代码如下：
+
+```java
+public class Solution {
+    public boolean repeatedSubstringPattern(String s) {
+        int l = s.length();
+	for(int i=l/2;i>=1;i--) {
+		if(l%i==0) {
+			int m = l/i;
+			String subS = s.substring(0,i);
+			StringBuilder sb = new StringBuilder();
+			for(int j=0;j<m;j++) {
+				sb.append(subS);
+			}
+			if(sb.toString().equals(s)) return true;
+		}
+	}
+	return false;
+}
+}
+```
+
