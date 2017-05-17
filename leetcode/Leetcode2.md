@@ -1592,3 +1592,202 @@ public class Solution {
 }
 ```
 
+# 2017-5-17
+
+## 汉明距离
+
+> 汉明距离是把两个整数转换成二进制数，把位数不同称为汉明距离。给定x和y，编写函数求出汉明距离。
+>
+> 例如：x=1,由、=4,输出2.因为 1的二进制表示为0001,4的二进制表示为0100,不同位数为2.所以输出2.
+
+这里我们明显看到汉明距离是x与y异或后1的个数。我们想到了Integer.bitCount（）。代码如下：
+
+```java
+public class Solution {
+    public int hammingDistance(int x, int y) {
+     return Integer.bitCount(x ^ y);
+    }
+}
+```
+
+另一种方法如下（做异或操作，然后移位计数）：
+
+```java
+public int hammingDistance(int x, int y) {
+    int xor = x ^ y, count = 0;
+    for (int i=0;i<32;i++) count += (xor >> i) & 1;
+    return count;
+}
+
+```
+
+## 岛周长
+
+> 给出一个二维整数网格形式的地图，其中1表示土地，0表示水。网格单元水平/垂直（不对角线）连接。网格完全被水包围并且正好有一个岛（即一个或多个连接的地面），岛内没有水，一个单元格是具有边长为1的正方形。网格为矩形，宽度和长度不超过100，确定岛的周长。
+
+这道题，我们需要发现的一个现象是如果有邻居的话，island*4-neighbour×2。因此，我们需要对岛屿进行计数，需要对岛屿的邻居进行计数。需要这两个变量。最后通过公式岛屿数乘以4-邻居数乘以2
+
+代码如下：
+
+```java
+public class Solution {
+    public int islandPerimeter(int[][] grid) {
+         int islands = 0, neighbours = 0;
+
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[i].length; j++) {
+                if (grid[i][j] == 1) {
+                    islands++; // count islands
+                    if (i < grid.length - 1 && grid[i + 1][j] == 1) neighbours++; // count down neighbours
+                    if (j < grid[i].length - 1 && grid[i][j + 1] == 1) neighbours++; // count right neighbours
+                  //同时需要注意计数规则，不能计数计重复了。只计下方和右方的即可。
+                }
+            }
+        }
+
+        return islands * 4 - neighbours * 2;
+    }
+}
+```
+
+## 加热器
+
+> 冬天就要来了。你的第一份工作是设计一个标准的加热器加热整个房间。现在你能得到房间的位置和加热器的位置，找出加热器的最小半径。注意：
+>
+> 1. 房子和加热器的数量是非负数，不超过25000
+> 2. 房屋和加热器的位置是肺腑数，不超过10^9
+> 3. 只要房子处于加热器的半径范围内们就可以加热。
+> 4. 所有加热器都遵循半径标准，半径内温度相同。
+
+我们这道题的思路如下：
+
+1. 对于每个房子，找到他们在这些加热1器之间的距离（需要对加热器进行排序）
+2. 计算房子和左边加热器和右边加热器的距离，得到最小值。注意拐角处没有左加热器或右加热器
+3. 获取步骤2中的最大值即为结果。
+
+代码如下：
+
+```java
+import java.util.Arrays;
+public class Solution {
+    public int findRadius(int[] houses, int[] heaters) {
+        Arrays.sort(heaters);
+        int result=Integer.MIN_VALUE;
+        for (int house: houses){
+            int index=Arrays.binarySearch(heaters,house);
+            if(index<0){//没找到房子在加热器的两端
+                index=-(index+1);
+                
+            }
+            //判断房子与左、右加热器的距离
+            int left= index-1>=0? house-heaters[index-1]:Integer.MAX_VALUE;
+            int right =index<heaters.length ? heaters[index]-house: Integer.MAX_VALUE;
+            result=Math.max(result,Math.min(right,left));
+        }
+        return result;
+      
+    }
+}
+```
+
+## 数字补码
+
+> 给定一个数字，输出其二进制补码表示的十进制数，这里的补码策略为反转二进制位。如输入5,其二进制为101,补码为010,故输出2.
+
+Integer.hightestOneBit:   [返回整数的最高位（最左边）的位为1表示的整数],如170的二进制数表示为10101010.那麽Integer.highestOneBit(170)=128.
+
+负数的补码的求解是取反末尾加1，整数补码是其本身。
+
+代码如下：
+
+```java
+public class Solution {
+    public int findComplement(int num) {
+         int mask = (Integer.highestOneBit(num) << 1) - 1;//获得全1的掩码
+        num = ~num;//取非操作
+        return num & mask;//返回补码，计算补码据可以这样来算，不论正数或负数
+    }
+}
+```
+
+## 最长连续1的个数
+
+> 给定二进制数，找到此数组中连续1的最大数。
+
+代码如下：
+
+```java
+public class Solution {
+    public int findMaxConsecutiveOnes(int[] nums) {
+        int result=0;
+        int count=0;
+        for(int i=0;i<nums.length;i++){
+            if(nums[i]==1) {
+                count++;
+                result=Math.max(count,result);
+            }else{
+                count=0;
+            }
+        }
+        return result;
+    }
+}
+```
+
+## 构造矩形
+
+> 对于web开发者来说，设计一个web页面是很重要的。所以，给定一个特定的矩形网页区域，现在你的工作就是设计一个矩形区域满足以下条件：
+>
+> 1. 设计的矩形面积必须等给定的目标区域。
+> 2. L>=w
+> 3. 长度L和宽度W之间的差异尽可能小
+
+第一感觉是开平方，但我们需要在开平方之后继续处理，注意这点
+
+```java
+public class Solution {
+    public int[] constructRectangle(int area) {
+        int w = (int)Math.sqrt(area);
+	while (area%w!=0) w--;
+	return new int[]{area/w, w};
+    }
+}
+```
+
+## 下一个更大的数
+
+> 给定两个数组nums1和num2,其中nums1是nums2的子集。查找nums2的相应位置中nums1元素的所有下一个更大的数字。
+>
+> ```
+> Input: nums1 = [4,1,2], nums2 = [1,3,4,2].
+> Output: [-1,3,-1]
+> Explanation:
+>     For number 4 in the first array, you cannot find the next greater number for it in the second array, so output -1.
+>     For number 1 in the first array, the next greater number for it in the second array is 3.
+>     For number 2 in the first array, there is no next greater number for it in the second array, so output -1.
+> ```
+
+代码如下：
+
+```java
+public class Solution {
+    public int[] nextGreaterElement(int[] findNums, int[] nums) {
+        int[] ret = new int[findNums.length];
+        ArrayDeque<Integer> stack = new ArrayDeque<>();
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for(int i = nums.length - 1; i >= 0; i--) {
+            while(!stack.isEmpty() && stack.peek() <= nums[i]) {
+                stack.pop();
+            }
+            if(stack.isEmpty()) map.put(nums[i], -1);
+            else map.put(nums[i], stack.peek());
+            stack.push(nums[i]);
+        }
+        for(int i = 0; i < findNums.length; i++) {
+            ret[i] = map.get(findNums[i]);
+        }
+        return ret;
+    }
+}
+```
+
