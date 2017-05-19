@@ -1791,3 +1791,235 @@ public class Solution {
 }
 ```
 
+# 2017-5-18
+
+##  寻找二叉搜索树的重复元素
+
+> 给定具有重复的二叉搜索树（BST），找出给定BST中所有重复元素。BST定义如下：
+>
+> 1. 节点的左子树仅包括具有小于或等于该节点的密钥的几点
+> 2. 节点的右子树仅包含大于或恩关于该节点的密钥的节点
+> 3. 左右子树也必须是二叉搜索树。
+>
+> Given BST `[1,null,2,2]`,
+>
+> ```
+>    1
+>     \
+>      2
+>     /
+>    2
+>
+> ```
+>
+> return `[2]`.
+
+代码如下：
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+   
+     Integer prev = null;
+    int count = 1;
+    int max = 0;
+    public int[] findMode(TreeNode root) {
+        if (root == null) return new int[0];
+        
+        List<Integer> list = new ArrayList<>();
+        traverse(root, list);
+        
+        int[] res = new int[list.size()];
+        for (int i = 0; i < list.size(); ++i) res[i] = list.get(i);
+        return res;
+    }
+    
+    private void traverse(TreeNode root, List<Integer> list) {
+        if (root == null) return;
+        traverse(root.left, list);
+        if (prev != null) {
+            if (root.val == prev)
+                count++;
+            else
+                count = 1;
+        }
+        if (count > max) {
+            max = count;
+            list.clear();
+            list.add(root.val);
+        } else if (count == max) {
+            list.add(root.val);
+        }
+        prev = root.val;
+        traverse(root.right, list);
+    }
+}
+
+
+```
+
+## 转换7进制
+
+> 给定一个整数，把它转换为7进制表示的字符串
+
+代码如下：
+
+```java
+public class Solution {
+    public String convertToBase7(int num) {
+       if (num == 0) return "0";
+        
+        StringBuilder sb = new StringBuilder();
+        boolean negative = false;
+        
+        if (num < 0) {
+            negative = true;
+        }
+        while (num != 0) {
+            sb.append(Math.abs(num % 7));
+            num = num / 7;
+        }//注意这里的核心代码
+        
+        if (negative) {
+            sb.append("-");
+        }
+        
+        return sb.reverse().toString();//注意返回值，要先取反
+    }
+}
+```
+
+## 相对排名
+
+> 给定n个运动员的分数，找到相对排名前三的运动员，分别授予 gold media , silver medal ,bronze medal .例如：
+>
+> ```
+> Input: [5, 4, 3, 2, 1]
+> Output: ["Gold Medal", "Silver Medal", "Bronze Medal", "4", "5"]
+> Explanation: The first three athletes got the top three highest scores, so they got "Gold Medal", "Silver Medal" and "Bronze Medal". 
+> For the left two athletes, you just need to output their relative ranks according to their scores.
+> ```
+
+代码如下：
+
+```java
+public class Solution {
+    public String[] findRelativeRanks(int[] nums) {
+        int[][] pair = new int[nums.length][2];
+        
+        for (int i = 0; i < nums.length; i++) {
+            pair[i][0] = nums[i];
+            pair[i][1] = i;
+        }
+        
+        Arrays.sort(pair, (a, b) -> (b[0] - a[0]));
+        
+        String[] result = new String[nums.length];
+
+        for (int i = 0; i < nums.length; i++) {
+            if (i == 0) {
+                result[pair[i][1]] = "Gold Medal";
+            }
+            else if (i == 1) {
+                result[pair[i][1]] = "Silver Medal";
+            }
+            else if (i == 2) {
+                result[pair[i][1]] = "Bronze Medal";
+            }
+            else {
+                result[pair[i][1]] = (i + 1) + "";
+            }
+        }
+
+        return result;
+    }
+}
+```
+
+## 完美数字
+
+> 我们定义一个完美数字，它的所有约数之和等于其本身。编写函数，判断是否是完美数字。是返回true。否则返回false。
+
+```java
+public class Solution {
+    public boolean checkPerfectNumber(int num) {
+          if (num == 1) return false;
+        
+        int sum = 0;
+        for (int i = 2; i <= Math.sqrt(num); i++) {
+            if (num % i == 0) {
+                sum += i;
+                if (i != num / i) sum += num / i;
+            }
+        }
+        sum++;
+        
+        return sum == num;
+    }
+}
+```
+
+## 大写检测
+
+> 给定一个单词，你需要判断大写使用的是否正确。我们定义大写字母使用规则如下：
+>
+> 1. 所有单词都大写
+> 2. 所有单词都小写
+> 3. 只有第一个字母大写
+
+这里如果我们使用正则表达式:
+
+```
+[A-Z]+|[a-z]+|[A-Z][a-z]+
+```
+
+代码如下：
+
+```java
+public class Solution {
+    public boolean detectCapitalUse(String word) {
+       return word.matches("[A-Z]+|[a-z]+|[A-Z][a-z]+"); 
+    }
+}
+```
+
+另一种想法，代码如下：
+
+```java
+public class Solution {
+    public boolean detectCapitalUse(String word) {
+        int cnt = 0;
+        for(char c: word.toCharArray()) if('Z' - c >= 0) cnt++;
+        return ((cnt==0 || cnt==word.length()) || (cnt==1 && 'Z' - word.charAt(0)>=0));
+    }
+}
+```
+
+大写字母的ASCII范围为65---90;小写字母的ASCII范围为97-122.所以cnt=0时，全部为小写 cnt==word.length(),则全部为大写。后一种情况为首字母大写其余小写
+
+##  Longest Uncommon Subsequence
+
+> Given a group of two strings, you need to find the longest uncommon subsequence of this group of two strings.The longest uncommon subsequence is defined as the longest subsequence of one of these strings and this subsequence should not be **any** subsequence of the other strings.
+>
+> A **subsequence** is a sequence that can be derived from one sequence by deleting some characters without changing the order of the remaining elements. Trivially, any string is a subsequence of itself and an empty string is a subsequence of any string.
+>
+> The input will be two strings, and the output needs to be the length of the longest uncommon subsequence. If the longest uncommon subsequence doesn't exist, return -1.
+
+代码如下：
+
+```java
+public class Solution {
+    public int findLUSlength(String a, String b) {
+        return a.equals(b) ? -1 : Math.max(a.length(), b.length());
+    }
+}
+```
+
