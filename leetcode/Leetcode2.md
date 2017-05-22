@@ -2023,3 +2023,332 @@ public class Solution {
 }
 ```
 
+# 2017-5-22
+
+## BST最小绝对差
+
+> 给定具有非负值的二叉搜索树，找到任何两个节点的最小差值
+
+代码如下：
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+     int minDiff = Integer.MAX_VALUE;
+    TreeNode prev;
+    
+    public int getMinimumDifference(TreeNode root) {
+        inorder(root);
+        return minDiff;
+    }
+    
+    public void inorder(TreeNode root) {
+        if (root == null) return;
+        inorder(root.left);
+        if (prev != null) minDiff = Math.min(minDiff, root.val - prev.val);
+        prev = root;
+        inorder(root.right);
+    }
+
+}
+```
+
+## 反转字符串
+
+> 给定一个字符串和一个整数k。以2k为单位，反转前k个。如果字符串长度不足k个反转全部。如果字符串小于2k大于k，反转k个字符，剩余的保持原样。
+
+代码如下：
+
+```java
+public class Solution {
+    public String reverseStr(String s, int k) {
+        char[] ca = s.toCharArray();
+        for (int left = 0; left < ca.length; left += 2 * k) {
+            for (int i = left, j = Math.min(left + k - 1, ca.length - 1); i < j; i++, j--) {
+                char tmp = ca[i];
+                ca[i] = ca[j];
+                ca[j] = tmp;
+            }
+        }
+        return new String(ca);
+    }
+}
+```
+
+## 二叉树直径
+
+> 给定一个二叉树，你需要计算出二叉树的直径。二叉树的直径是这样定义的：任意两个节点之间路径的最长长度。这个路径可以通过也可以不通过根节点。
+
+代码如下：
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+
+    int max = 0;
+    
+    public int diameterOfBinaryTree(TreeNode root) {
+        maxDepth(root);
+        return max;
+    }
+    
+    private int maxDepth(TreeNode root) {
+        if (root == null) return 0;
+        
+        int left = maxDepth(root.left);
+        int right = maxDepth(root.right);
+        
+        max = Math.max(max, left + right);
+        
+        return Math.max(left, right) + 1;
+    }
+}
+```
+
+## 学生考勤记录
+
+> 你现在有一个字符串来代表学生的考勤记录。这个记录只包括以下字符：
+>
+> 1. ‘A'： absent  缺勤
+> 2. ’L'： later 迟到
+> 3. ‘P'： present  出席
+>
+> 一个学生出勤记录中如果有不多于1个的A或少于连续2个L。他应当被奖励。请编写函数确定学生是否应该被奖励。
+
+这里给出一个字符串匹配的方法：
+
+```java
+public class Solution {
+    public boolean checkRecord(String s) {
+         return !s.matches(".*LLL.*|.*A.*A.*");
+    }
+}
+```
+
+下面这种方法是很常规的计算字符串中有多少个A多少个L。但要注意连续的L才算数，看程序中如何计数连续的L
+
+```java
+public class Solution {
+    public boolean checkRecord(String s) {
+        olean checkRecord(String s) {
+        int countA=0;
+        int continuosL = 0;
+        int charA = 'A';
+        int charL ='L';
+        for(int i=0;i<s.length();i++){
+            if(s.charAt(i) == charA){
+                countA++;
+                continuosL = 0;
+            }
+            else if(s.charAt(i) == charL){
+                continuosL++;
+            }
+            else{
+                continuosL = 0;
+            }
+            if(countA >1 || continuosL > 2 ){
+                return false;
+            }
+        }
+        return true;
+    }
+}
+```
+
+## 反转字符串中单词
+
+> 给定一个字符串，你需要颠倒字符串中每个单词的顺序，同时仍保留空格和初始单词顺序。
+
+```
+Input: "Let's take LeetCode contest"
+Output: "s'teL ekat edoCteeL tsetnoc"
+```
+
+代码如下：
+
+```java
+public class Solution {
+    public String reverseWords(String s) {
+   char[] s1 = s.toCharArray();
+    int i = 0;
+    for(int j = 0; j < s1.length; j++)
+    {
+        if(s1[j] == ' ')
+        {
+            reverse(s1, i, j - 1);
+            i = j + 1;
+        }
+    }
+    reverse(s1, i, s1.length - 1);//反转最后一个单词
+    return new String(s1);
+}
+
+public void reverse(char[] s, int l, int r)
+{
+	while(l < r)
+	{
+		char temp = s[l];
+		s[l] = s[r];
+		s[r] = temp;
+		l++; r--;
+	}
+}
+}
+```
+
+我们这里没有使用stingbuilder的reverse函数，因为需要保持原字符串中的空格和初始单词顺序，因此我们不能使用stingbuilder。因为stringbuilder有reserve函数，但无法知道其他信息如空格和逗号等，并且string没有insert函数。因此不能使用stringbuilder只能自己实现反转函数。
+
+## 数组划分
+
+> Given an array of **2n** integers, your task is to group these integers into **n** pairs of integer, say (a1, b1), (a2, b2), ..., (an, bn) which makes sum of min(ai, bi) for all i from 1 to n as large as possible.
+
+代码如下：
+
+```java
+public class Solution {
+    public int arrayPairSum(int[] nums) {
+        Arrays.sort(nums);
+        int result = 0;
+        for (int i = 0; i < nums.length; i += 2) {
+            result += nums[i];
+        }
+        return result;
+    }
+}
+```
+
+## 二叉树倾斜
+
+> 给定一个二叉树，返回这个二叉树的倾斜。二叉树的倾斜定义为所有左子树之和与所有右子树之和差值的绝对值。
+
+```
+Input: 
+         1
+       /   \
+      2     3
+Output: 1
+Explanation: 
+Tilt of node 2 : 0
+Tilt of node 3 : 0
+Tilt of node 1 : |2-3| = 1
+Tilt of binary tree : 0 + 0 + 1 = 1
+```
+
+代码如下：
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    int result = 0;
+    
+    public int findTilt(TreeNode root) {
+        postOrder(root);
+        return result;
+    }
+    
+    private int postOrder(TreeNode root) {
+        if (root == null) return 0;
+        
+        int left = postOrder(root.left);
+        int right = postOrder(root.right);
+        
+        result += Math.abs(left - right);
+        
+        return left + right + root.val;//这里返回时问什么要+root.val?
+    }
+}
+```
+
+## 变形矩阵
+
+> 给出一个由二维数组表示的矩阵，两个正整数r和c分别表示所需要重组的矩阵的行号和列号。如果给定参数重塑操作是合法的，则返回重塑的矩阵，否则返回原矩阵。
+
+代码如下：
+
+```java
+public class Solution {
+    public int[][] matrixReshape(int[][] nums, int r, int c) {
+            int n = nums.length, m = nums[0].length;
+    if (r*c != n*m) return nums;
+    int[][] res = new int[r][c];
+    for (int i=0;i<r*c;i++) 
+        res[i/c][i%c] = nums[i/m][i%m];
+    return res;
+    }
+}
+```
+
+## 判断子树
+
+> 给定两个非空的二叉树s和t，检查s是否是t的子树。s子树可以认为是s的节点及其后代节点组成的，树可以看作是本身的子树。
+
+代码如下：
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+   public boolean isSubtree(TreeNode s, TreeNode t) {
+        if (s == null) return false;
+        if (isSame(s, t)) return true;
+        return isSubtree(s.left, t) || isSubtree(s.right, t);
+    }
+    
+    private boolean isSame(TreeNode s, TreeNode t) {
+        if (s == null && t == null) return true;
+        if (s == null || t == null) return false;
+        
+        if (s.val != t.val) return false;
+        
+        return isSame(s.left, t.left) && isSame(s.right, t.right);
+    }
+}
+```
+
+## 分配糖果
+
+> 给定一个具有均匀长度的整数数组，该数组中的不同数字表示不同种类的糖果。 每个数字表示相应类型的一个糖果。 你需要将这些糖果数量分配给兄弟姐妹。 返回姐妹可以获得的最多种类的糖果。
+
+代码如下：
+
+```java
+public class Solution {
+    public int distributeCandies(int[] candies) {
+          Set<Integer> kinds = new HashSet<>();
+        for (int candy : candies) kinds.add(candy);
+        return kinds.size() >= candies.length / 2 ? candies.length / 2 : kinds.size();
+    }
+}
+```
+
